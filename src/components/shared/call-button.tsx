@@ -2,7 +2,7 @@ export default function CallButton() {
   return (
     <a
       href="tel:+91XXXXXXXXXX"
-      className="fixed bottom-24 right-6 z-50 flex items-center justify-center w-14 h-14 bg-green-700 text-white rounded-full shadow-lg hover:bg-green-800 hover:scale-110 transition-all duration-300 group"
+      className="fixed bottom-24 md:bottom-28 right-4 md:right-6 z-50 flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-green-700 text-white rounded-full shadow-lg hover:bg-green-800 hover:scale-110 transition-all duration-300 group"
       aria-label="Call us"
     >
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-7 h-7">

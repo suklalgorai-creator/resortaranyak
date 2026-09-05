@@ -23,13 +23,13 @@ export default function Header() {
       <header 
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
           isScrolled 
-            ? 'bg-white/90 backdrop-blur-md shadow-sm py-4' 
+            ? 'glass shadow-sm py-4' 
             : 'bg-white py-6'
         }`}
       >
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <span className="font-playfair text-2xl font-bold text-green-800 tracking-tight">
+            <span className="font-playfair text-2xl font-bold text-forest tracking-tight">
               Resort Arranyak
             </span>
           </Link>
@@ -39,7 +39,7 @@ export default function Header() {
               <Link 
                 key={link.label} 
                 href={link.href}
-                className="text-stone-600 hover:text-green-700 font-medium transition-colors text-sm uppercase tracking-wider"
+                className="text-stone-600 hover:text-gold font-medium transition-colors text-sm uppercase tracking-wider"
               >
                 {link.label}
               </Link>
@@ -49,7 +49,7 @@ export default function Header() {
           <div className="hidden lg:flex items-center gap-4">
             <Link 
               href="/book" 
-              className="bg-green-700 hover:bg-green-800 text-white px-6 py-2.5 rounded-md font-medium transition-colors shadow-sm"
+              className="bg-gold hover:bg-gold/90 text-white px-6 py-2.5 rounded-md font-medium transition-colors shadow-sm"
             >
               Book Now
             </Link>

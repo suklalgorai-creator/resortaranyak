@@ -1,5 +1,8 @@
+"use client";
+
 import Link from 'next/link';
 import { siteConfig } from '@/config/site';
+import { motion } from 'framer-motion';
 
 export default function Hero() {
   return (
@@ -11,27 +14,42 @@ export default function Hero() {
       <div className="absolute inset-0 bg-black/60 z-10" />
 
       <div className="relative z-20 flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto mt-16">
-        <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl text-white font-bold leading-tight mb-6 drop-shadow-lg">
+        <motion.h1 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="font-serif text-4xl md:text-6xl lg:text-7xl text-white font-bold leading-tight mb-6 drop-shadow-lg"
+        >
           Welcome to {siteConfig.name}
-        </h1>
-        <p className="text-lg md:text-2xl text-stone-200 mb-10 max-w-3xl drop-shadow-md">
+        </motion.h1>
+        <motion.p 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-base md:text-xl lg:text-2xl text-stone-200 mb-10 max-w-3xl drop-shadow-md"
+        >
           {siteConfig.description}
-        </p>
+        </motion.p>
         
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 w-full sm:w-auto">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="flex flex-col sm:flex-row gap-4 sm:gap-6 w-full sm:w-auto px-4 sm:px-0"
+        >
           <Link 
             href="/book" 
-            className="px-8 py-4 bg-green-700 hover:bg-green-600 text-white text-lg font-medium rounded-sm transition-colors duration-300 text-center shadow-lg hover:shadow-xl"
+            className="px-6 sm:px-8 py-3 sm:py-4 bg-gold hover:bg-gold-light text-white text-base sm:text-lg font-medium rounded-sm transition-colors duration-300 text-center shadow-lg hover:shadow-xl whitespace-nowrap"
           >
             Book Your Stay
           </Link>
           <Link 
             href="/rooms" 
-            className="px-8 py-4 bg-transparent border-2 border-white text-white hover:bg-white hover:text-green-900 text-lg font-medium rounded-sm transition-all duration-300 text-center"
+            className="px-6 sm:px-8 py-3 sm:py-4 bg-transparent border-2 border-white text-white hover:bg-white hover:text-forest text-base sm:text-lg font-medium rounded-sm transition-all duration-300 text-center whitespace-nowrap"
           >
             Explore Rooms
           </Link>
-        </div>
+        </motion.div>
       </div>
 
       {/* Scroll down indicator */}

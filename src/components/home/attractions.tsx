@@ -33,7 +33,7 @@ const ATTRACTIONS = [
 
 export default function Attractions() {
   return (
-    <section className="py-20 md:py-32 bg-white px-4 sm:px-6 lg:px-8 border-y border-stone-100">
+    <section className="py-12 md:py-24 bg-white px-4 sm:px-6 lg:px-8 border-y border-stone-100">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="font-serif text-3xl md:text-5xl text-green-900 mb-4 font-semibold">

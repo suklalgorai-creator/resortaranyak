@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function CtaSection() {
   return (
-    <section className="py-24 relative overflow-hidden">
+    <section className="py-16 md:py-24 relative overflow-hidden">
       {/* Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-r from-green-900 via-green-800 to-emerald-900 z-0" />
       

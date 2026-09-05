@@ -6,6 +6,10 @@
   --color-ring: hsl(142.1 76.2% 36.3%);
   --color-background: hsl(0 0% 100%);
   --color-foreground: hsl(222.2 84% 4.9%);
+  --color-gold: hsl(43 74% 49%); /* Premium Gold */
+  --color-gold-light: hsl(43 74% 65%);
+  --color-forest: hsl(152 40% 20%); /* Deep Forest Green */
+  --color-sand: hsl(40 20% 97%); /* Warm stone/sand background */
 }
 
 @layer base {
@@ -13,9 +17,25 @@
     border-color: var(--color-border);
   }
   body {
-    background-color: var(--color-background);
+    background-color: var(--color-sand);
     color: var(--color-foreground);
   }
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-forest);
+  }
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+.glass-dark {
+  background: rgba(13, 40, 24, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 html {

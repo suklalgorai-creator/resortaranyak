@@ -2,7 +2,7 @@ import { testimonials } from '@/lib/data';
 
 export default function Testimonials() {
   return (
-    <section className="py-20 md:py-32 bg-green-50 px-4 sm:px-6 lg:px-8">
+    <section className="py-12 md:py-24 bg-green-50 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="font-serif text-3xl md:text-5xl text-green-900 mb-4 font-semibold">
