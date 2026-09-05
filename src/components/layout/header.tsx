@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { navigationLinks } from '@/config/navigation';
 import MobileNav from '@/components/layout/mobile-nav';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -46,7 +47,7 @@ export default function Header() {
             ))}
           </nav>
           
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-4">`n            <ThemeToggle />
             <Link 
               href="/book" 
               className="bg-gold hover:bg-gold/90 text-white px-6 py-2.5 rounded-md font-medium transition-colors shadow-sm"

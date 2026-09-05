@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
 import './globals.css';
+import { ThemeProvider } from '@/components/theme-provider';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import WhatsAppButton from '@/components/shared/whatsapp-button';
@@ -22,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
-      <body className="overflow-x-hidden font-sans antialiased min-h-screen flex flex-col relative">
+      <body className="overflow-x-hidden font-sans antialiased min-h-screen flex flex-col relative">`n<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <Header />
         <main className="flex-1 flex flex-col">
           {children}
@@ -31,7 +32,7 @@ export default function RootLayout({
         <WhatsAppButton />
         <CallButton />
         <Toaster position="top-center" />
-      </body>
+      </ThemeProvider>`n</body>
     </html>
   );
 }
