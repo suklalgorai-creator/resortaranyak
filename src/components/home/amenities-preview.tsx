@@ -43,10 +43,10 @@ const AMENITIES = [
 
 export default function AmenitiesPreview() {
   return (
-    <section className="py-12 md:py-24 bg-white px-4 sm:px-6 lg:px-8 border-y border-stone-100">
+    <section className="py-12 md:py-24 bg-white dark:bg-[#1E1E1E] px-4 sm:px-6 lg:px-8 border-y border-stone-100 dark:border-stone-800">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="font-serif text-3xl md:text-5xl text-green-900 mb-4 font-semibold">
+          <h2 className="font-serif text-3xl md:text-5xl text-green-900 dark:text-stone-200 mb-4 font-semibold">
             Resort Amenities
           </h2>
           <div className="w-16 h-1 bg-amber-600 mx-auto rounded-full opacity-80" />
@@ -55,13 +55,13 @@ export default function AmenitiesPreview() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12">
           {AMENITIES.map((amenity, index) => (
             <div key={index} className="flex flex-col items-center text-center group">
-              <div className="w-16 h-16 rounded-full bg-stone-50 flex items-center justify-center text-3xl mb-4 group-hover:bg-green-50 group-hover:scale-110 transition-all duration-300">
+              <div className="w-16 h-16 rounded-full bg-stone-50 dark:bg-stone-800 flex items-center justify-center text-3xl mb-4 group-hover:bg-green-50 dark:group-hover:bg-stone-700 group-hover:scale-110 transition-all duration-300">
                 {amenity.icon}
               </div>
-              <h3 className="text-lg font-semibold text-green-900 mb-2">
+              <h3 className="text-lg font-semibold text-green-900 dark:text-stone-200 mb-2">
                 {amenity.name}
               </h3>
-              <p className="text-sm text-stone-500">
+              <p className="text-sm text-stone-500 dark:text-stone-400">
                 {amenity.description}
               </p>
             </div>
