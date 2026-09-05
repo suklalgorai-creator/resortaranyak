@@ -37,7 +37,7 @@ export default function AboutPage() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          <div className="bg-white dark:bg-stone-900 p-8 rounded-xl shadow-sm border border-green-100 dark:border-stone-800 text-center hover:shadow-md transition-shadow">
+          <div className="bg-white glass-card p-8 rounded-xl shadow-sm border border-green-100 dark:border-stone-800 text-center hover:shadow-md transition-shadow">
             <div className="w-16 h-16 bg-green-100 dark:bg-stone-800 rounded-full flex items-center justify-center mx-auto mb-6 text-green-800 dark:text-stone-200 text-2xl">
               🌿
             </div>
@@ -45,7 +45,7 @@ export default function AboutPage() {
             <p className="text-green-800/70 dark:text-stone-400">Immerse yourself in lush greenery, fresh air, and the soothing sounds of the forest.</p>
           </div>
           
-          <div className="bg-white dark:bg-stone-900 p-8 rounded-xl shadow-sm border border-green-100 dark:border-stone-800 text-center hover:shadow-md transition-shadow">
+          <div className="bg-white glass-card p-8 rounded-xl shadow-sm border border-green-100 dark:border-stone-800 text-center hover:shadow-md transition-shadow">
             <div className="w-16 h-16 bg-green-100 dark:bg-stone-800 rounded-full flex items-center justify-center mx-auto mb-6 text-green-800 dark:text-stone-200 text-2xl">
               🛏️
             </div>
@@ -53,7 +53,7 @@ export default function AboutPage() {
             <p className="text-green-800/70 dark:text-stone-400">Cozy, well-appointed rooms and tents designed for your ultimate relaxation.</p>
           </div>
 
-          <div className="bg-white dark:bg-stone-900 p-8 rounded-xl shadow-sm border border-green-100 dark:border-stone-800 text-center hover:shadow-md transition-shadow">
+          <div className="bg-white glass-card p-8 rounded-xl shadow-sm border border-green-100 dark:border-stone-800 text-center hover:shadow-md transition-shadow">
             <div className="w-16 h-16 bg-green-100 dark:bg-stone-800 rounded-full flex items-center justify-center mx-auto mb-6 text-green-800 dark:text-stone-200 text-2xl">
               🍽️
             </div>

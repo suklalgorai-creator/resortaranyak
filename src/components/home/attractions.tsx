@@ -33,13 +33,13 @@ const ATTRACTIONS = [
 
 export default function Attractions() {
   return (
-    <section className="py-12 md:py-24 bg-white px-4 sm:px-6 lg:px-8 border-y border-stone-100">
+    <section className="py-12 md:py-24 bg-white glass-section px-4 sm:px-6 lg:px-8 border-y border-stone-100 dark:border-stone-800">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="font-serif text-3xl md:text-5xl text-green-900 mb-4 font-semibold">
+          <h2 className="font-serif text-3xl md:text-5xl text-green-900 dark:text-stone-200 mb-4 font-semibold">
             Explore the Neighbourhood
           </h2>
-          <p className="text-stone-600 max-w-2xl mx-auto">
+          <p className="text-stone-600 dark:text-stone-400 max-w-2xl mx-auto">
             Discover the natural wonders, historical sites, and cultural heritage surrounding Ghatsila.
           </p>
         </div>
@@ -48,17 +48,17 @@ export default function Attractions() {
           {ATTRACTIONS.map((attraction, index) => (
             <div 
               key={index}
-              className="border border-stone-200 rounded-lg p-6 hover:border-green-300 hover:bg-green-50/50 transition-colors duration-300 group"
+              className="border border-stone-200 rounded-lg p-6 hover:border-green-300 hover:bg-green-50/50 transition-colors duration-300 group glass-card"
             >
               <div className="flex justify-between items-start mb-3">
-                <h3 className="font-semibold text-lg text-green-900 group-hover:text-green-700">
+                <h3 className="font-semibold text-lg text-green-900 dark:text-stone-200 group-hover:text-green-700">
                   {attraction.name}
                 </h3>
-                <span className="inline-block px-2 py-1 bg-stone-100 text-stone-600 text-xs font-medium rounded-sm group-hover:bg-green-100 group-hover:text-green-800 transition-colors">
+                <span className="inline-block px-2 py-1 bg-stone-100 text-stone-600 dark:text-stone-400 text-xs font-medium rounded-sm group-hover:bg-green-100 group-hover:text-green-800 transition-colors">
                   {attraction.distance}
                 </span>
               </div>
-              <p className="text-stone-600 text-sm leading-relaxed">
+              <p className="text-stone-600 dark:text-stone-400 text-sm leading-relaxed">
                 {attraction.description}
               </p>
             </div>

@@ -60,7 +60,7 @@ export default function ContactPage() {
           </div>
 
           {/* Contact Form */}
-          <div className="bg-white dark:bg-stone-900 p-8 rounded-2xl shadow-sm border border-green-100 dark:border-stone-800">
+          <div className="bg-white glass-card p-8 rounded-2xl shadow-sm border border-green-100 dark:border-stone-800">
             <h3 className="text-2xl font-serif text-green-900 dark:text-stone-200 mb-6">Send us a Message</h3>
             <form className="space-y-4">
               <div>

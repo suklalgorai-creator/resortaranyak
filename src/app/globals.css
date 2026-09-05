@@ -14,44 +14,95 @@
 
 @layer base {
   :root {
-    --background: hsl(40 20% 97%); /* Sand */
-    --foreground: hsl(222.2 84% 4.9%); /* Dark text */
-    --forest: hsl(152 40% 20%); /* Deep Forest Green */
+    --background: hsl(40 20% 97%);
+    --foreground: hsl(222.2 84% 4.9%);
+    --forest: hsl(152 40% 20%);
     --sand: hsl(40 20% 97%);
     --border: hsl(214.3 31.8% 91.4%);
     --gold: hsl(43 74% 49%);
     --gold-light: hsl(43 74% 65%);
   }
-  
+
   .dark {
-    --background: hsl(0 0% 12%); /* Charcoal Black */
-    --foreground: hsl(0 0% 95%); /* Light text */
-    --forest: hsl(152 30% 70%); /* Lighter green for dark mode visibility */
-    --sand: hsl(0 0% 16%); /* Slightly lighter charcoal for cards */
-    --border: hsl(0 0% 20%);
+    --background: hsl(0 0% 7%);
+    --foreground: hsl(0 0% 95%);
+    --forest: hsl(152 45% 65%);
+    --sand: hsl(0 0% 10%);
+    --border: rgba(255, 255, 255, 0.08);
   }
-  
+
   * {
     border-color: var(--border);
   }
+
   body {
     background-color: var(--background);
     color: var(--foreground);
   }
+
   h1, h2, h3, h4, h5, h6 {
     color: var(--forest);
   }
 }
 
+/* ===== GLASSMORPHISM SYSTEM ===== */
+
+/* Light mode glass */
 .glass {
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
+
+/* Dark mode - GLOBAL GLASS */
+.dark body {
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(16, 85, 55, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(180, 130, 20, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 100%, rgba(10, 60, 40, 0.12) 0%, transparent 50%);
+  background-color: hsl(0 0% 7%);
+  background-attachment: fixed;
+}
+
 .dark .glass {
-  background: rgba(30, 30, 30, 0.75); /* Charcoal glass */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(20, 20, 20, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Glass Card - for sections and cards in dark mode */
+.dark .glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dark .glass-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Glass Section - for full-width sections */
+.dark .glass-section {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Glass input fields */
+.dark .glass-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.dark .glass-input:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  outline: none;
 }
 
 html {

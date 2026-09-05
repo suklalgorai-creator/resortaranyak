@@ -17,11 +17,11 @@ export default function RoomsPage() {
       </section>
 
       {/* Rooms Grid */}
-      <section className="py-16 md:py-24 bg-stone-50 dark:bg-[#1E1E1E]">
+      <section className="py-16 md:py-24 bg-stone-50 glass-section">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {featuredRooms.map((room) => (
-              <div key={room.id} className="bg-white dark:bg-stone-900 rounded-2xl overflow-hidden shadow-sm dark:shadow-none hover:shadow-xl transition-shadow duration-300 border border-stone-100 dark:border-stone-800 flex flex-col">
+              <div key={room.id} className="bg-white glass-card rounded-2xl overflow-hidden shadow-sm dark:shadow-none hover:shadow-xl transition-shadow duration-300 border border-stone-100 dark:border-stone-800 flex flex-col">
                 <div className="relative h-64 overflow-hidden group">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img

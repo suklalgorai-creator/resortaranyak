@@ -1,11 +1,10 @@
 "use client";
 
-import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
 export default function Introduction() {
   return (
-    <section className="py-12 md:py-24 bg-white dark:bg-[#1E1E1E] px-4 sm:px-6 lg:px-8">
+    <section className="py-12 md:py-24 bg-white glass-section px-4 sm:px-6 lg:px-8">
       <motion.div 
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -34,3 +33,4 @@ export default function Introduction() {
     </section>
   );
 }
+

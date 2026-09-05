@@ -2,7 +2,7 @@ import { testimonials } from '@/lib/data';
 
 export default function Testimonials() {
   return (
-    <section className="py-12 md:py-24 bg-green-50 dark:bg-[#1E1E1E] px-4 sm:px-6 lg:px-8">
+    <section className="py-12 md:py-24 bg-green-50 glass-section px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="font-serif text-3xl md:text-5xl text-green-900 dark:text-stone-200 mb-4 font-semibold">
@@ -17,7 +17,7 @@ export default function Testimonials() {
           {testimonials.map((testimonial) => (
             <div 
               key={testimonial.id}
-              className="bg-white dark:bg-stone-900 p-8 rounded-xl shadow-sm dark:shadow-none hover:shadow-md transition-shadow relative"
+              className="bg-white glass-card p-8 rounded-xl shadow-sm dark:shadow-none hover:shadow-md transition-shadow relative"
             >
               {/* Quote icon */}
               <div className="absolute top-6 left-6 text-green-100 dark:text-stone-700 opacity-50">
@@ -34,7 +34,7 @@ export default function Testimonials() {
                 </div>
                 
                 <p className="text-stone-700 dark:text-stone-300 italic mb-8 flex-grow leading-relaxed">
-                  "{testimonial.quote}"
+                  &quot;{testimonial.quote}&quot;
                 </p>
                 
                 <div className="mt-auto">
@@ -53,3 +53,4 @@ export default function Testimonials() {
     </section>
   );
 }
+

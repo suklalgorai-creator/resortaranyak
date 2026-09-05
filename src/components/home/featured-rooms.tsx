@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 
 export default function FeaturedRooms() {
   return (
-    <section className="py-12 md:py-24 bg-stone-50 dark:bg-[#1E1E1E] px-4 sm:px-6 lg:px-8">
+    <section className="py-12 md:py-24 bg-stone-50 glass-section px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
@@ -31,7 +31,7 @@ export default function FeaturedRooms() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.2 }}
-              className="bg-white dark:bg-stone-900 rounded-lg overflow-hidden shadow-md dark:shadow-none hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1"
+              className="bg-white glass-card rounded-lg overflow-hidden shadow-md dark:shadow-none hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1"
             >
               {/* Image */}
               <div className="h-64 w-full relative overflow-hidden">

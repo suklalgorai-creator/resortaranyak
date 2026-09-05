@@ -102,7 +102,7 @@ export default function RoomDetailsPage({ params }: { params: { slug: string } }
               </button>
               
               <p className="text-center text-stone-400 dark:text-stone-500 text-xs mt-4">
-                You won't be charged yet
+                You won&apos;t be charged yet
               </p>
             </div>
           </div>
@@ -111,3 +111,4 @@ export default function RoomDetailsPage({ params }: { params: { slug: string } }
     </div>
   );
 }
+
