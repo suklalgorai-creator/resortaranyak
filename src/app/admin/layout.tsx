@@ -1,26 +1,30 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useState } from 'react';
+import { LayoutDashboard, BedDouble, CalendarDays, Image, MessageSquare, Settings, ArrowLeft, Menu } from 'lucide-react';
 
 const sidebarLinks = [
-  { label: 'Dashboard', href: '/admin/dashboard', icon: '??' },
-  { label: 'Rooms', href: '/admin/rooms', icon: '???' },
-  { label: 'Bookings', href: '/admin/bookings', icon: '??' },
-  { label: 'Gallery', href: '/admin/gallery', icon: '???' },
-  { label: 'Enquiries', href: '/admin/enquiries', icon: '??' },
-  { label: 'Settings', href: '/admin/settings', icon: '??' },
+  { label: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+  { label: 'Rooms', href: '/admin/rooms', icon: BedDouble },
+  { label: 'Bookings', href: '/admin/bookings', icon: CalendarDays },
+  { label: 'Gallery', href: '/admin/gallery', icon: Image },
+  { label: 'Enquiries', href: '/admin/enquiries', icon: MessageSquare },
+  { label: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
+  }
+
   return (
     <div className="min-h-screen bg-stone-100 dark:bg-[#111] flex">
-      {/* Mobile overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -28,7 +32,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         />
       )}
 
-      {/* Sidebar */}
       <aside className={`fixed top-0 left-0 h-full w-64 bg-white glass-card border-r border-stone-200 dark:border-stone-800 z-50 transform transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-6 border-b border-stone-200 dark:border-stone-800">
           <Link href="/admin/dashboard" className="block">
@@ -40,6 +43,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <nav className="p-4 flex flex-col gap-1">
           {sidebarLinks.map((link) => {
             const isActive = pathname === link.href || pathname?.startsWith(link.href + '/');
+            const Icon = link.icon;
             return (
               <Link
                 key={link.href}
@@ -51,7 +55,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     : 'text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'
                 }`}
               >
-                <span className="text-lg">{link.icon}</span>
+                <Icon className="w-5 h-5" />
                 {link.label}
               </Link>
             );
@@ -60,22 +64,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-stone-200 dark:border-stone-800">
           <Link href="/" className="flex items-center gap-2 px-4 py-2 text-sm text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300 transition-colors">
-            ? Back to Website
+            <ArrowLeft className="w-4 h-4" /> Back to Website
           </Link>
         </div>
       </aside>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-screen">
-        {/* Top bar */}
         <header className="sticky top-0 z-30 bg-white glass-card border-b border-stone-200 dark:border-stone-800 px-4 lg:px-8 py-4 flex items-center justify-between">
           <button
             onClick={() => setSidebarOpen(true)}
             className="lg:hidden p-2 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-            </svg>
+            <Menu className="w-6 h-6" />
           </button>
 
           <div className="flex items-center gap-4 ml-auto">
@@ -90,7 +90,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </header>
 
-        {/* Page Content */}
         <main className="flex-1 p-4 lg:p-8">
           {children}
         </main>
