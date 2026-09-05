@@ -44,11 +44,11 @@ export default function AdminBookingsPage() {
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={px-4 py-2 rounded-lg text-sm font-medium transition-colors {
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               filter === f
                 ? 'bg-green-600 text-white'
                 : 'bg-white glass-card text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-white/10 border border-stone-200 dark:border-white/5'
-            }}
+            }`}}
           >
             {f} {f !== 'All' && ({allBookings.filter(b => b.status === f).length})}
           </button>
@@ -81,9 +81,9 @@ export default function AdminBookingsPage() {
                   <td className="p-4 text-sm text-stone-600 dark:text-stone-400 hidden md:table-cell">{b.room}</td>
                   <td className="p-4 text-xs text-stone-600 dark:text-stone-400 hidden lg:table-cell">{b.checkIn} ? {b.checkOut}</td>
                   <td className="p-4 text-sm font-semibold text-stone-800 dark:text-stone-200">?{b.amount.toLocaleString()}</td>
-                  <td className={p-4 text-sm font-medium hidden md:table-cell {paymentColors[b.paymentStatus]}}>{b.paymentStatus}</td>
+                  <td className={`p-4 text-sm font-medium hidden md:table-cell ${paymentColors[b.paymentStatus]}`}>{b.paymentStatus}</td>
                   <td className="p-4">
-                    <span className={	ext-xs font-medium px-3 py-1 rounded-full {statusColors[b.status]}}>{b.status}</span>
+                    <span className={`text-xs font-medium px-3 py-1 rounded-full ${statusColors[b.status]}`}>{b.status}</span>
                   </td>
                 </tr>
               ))}

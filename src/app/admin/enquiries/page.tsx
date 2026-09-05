@@ -27,11 +27,11 @@ export default function AdminEnquiriesPage() {
 
       <div className="space-y-4">
         {items.map((enq) => (
-          <div key={enq.id} className={g-white glass-card rounded-xl border p-6 transition-all {
+          <div key={enq.id} className={`bg-white glass-card rounded-xl border p-6 transition-all ${
             enq.isRead
               ? 'border-stone-200 dark:border-white/5'
               : 'border-gold/40 dark:border-gold/20 ring-1 ring-gold/10'
-          }}>
+          }`}>
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">

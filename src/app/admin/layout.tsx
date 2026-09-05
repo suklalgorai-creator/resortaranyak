@@ -45,11 +45,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 key={link.href}
                 href={link.href}
                 onClick={() => setSidebarOpen(false)}
-                className={lex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all {
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
                   isActive
                     ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-400 shadow-sm'
                     : 'text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'
-                }}
+                }`}
               >
                 <span className="text-lg">{link.icon}</span>
                 {link.label}

@@ -34,7 +34,7 @@ export default function AdminDashboard() {
         {stats.map((stat) => (
           <div key={stat.label} className="bg-white glass-card rounded-xl p-6 border border-stone-200 dark:border-stone-800 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
-              <span className={	ext-2xl p-2 rounded-lg {stat.color}}>{stat.icon}</span>
+              <span className={`text-2xl p-2 rounded-lg ${stat.color}`}>{stat.icon}</span>
               <span className="text-xs font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-full">{stat.change}</span>
             </div>
             <p className="text-2xl font-bold text-stone-800 dark:text-stone-100">{stat.value}</p>
@@ -85,7 +85,7 @@ export default function AdminDashboard() {
                   <td className="p-4 text-sm text-stone-600 dark:text-stone-400 hidden lg:table-cell">{booking.checkOut}</td>
                   <td className="p-4 text-sm font-semibold text-stone-800 dark:text-stone-200">{booking.amount}</td>
                   <td className="p-4">
-                    <span className={	ext-xs font-medium px-3 py-1 rounded-full {statusColors[booking.status]}}>
+                    <span className={`text-xs font-medium px-3 py-1 rounded-full ${statusColors[booking.status]}`}>
                       {booking.status}
                     </span>
                   </td>
