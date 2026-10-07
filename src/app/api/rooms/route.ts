@@ -1,7 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { roomService } from '@/services/room.service';
+import { AppError } from '@/lib/errors';
 
-// GET /api/rooms — List all active rooms
-export async function GET() {
-  // Will be implemented in Phase 4
-  return NextResponse.json({ message: 'Rooms API — Coming in Phase 4' });
+export async function GET(req: NextRequest) {
+  try {
+    const rooms = await roomService.getAll();
+    return NextResponse.json({ success: true, data: rooms });
+  } catch (error: any) {
+    const statusCode = error instanceof AppError ? error.statusCode : 500;
+    return NextResponse.json({ success: false, error: error.message }, { status: statusCode });
+  }
 }

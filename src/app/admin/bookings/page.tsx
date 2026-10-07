@@ -47,16 +47,16 @@ export default function AdminBookingsPage() {
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               filter === f
                 ? 'bg-green-600 text-white'
-                : 'bg-white glass-card text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-white/10 border border-stone-200 dark:border-white/5'
-            }`}}
+                : 'bg-white dark:bg-white/5 glass-card text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-white/10 border border-stone-200 dark:border-white/5'
+            }`}
           >
-            {f} {f !== 'All' && ({allBookings.filter(b => b.status === f).length})}
+            {f} {f !== 'All' && `(${allBookings.filter(b => b.status === f).length})`}
           </button>
         ))}
       </div>
 
       {/* Bookings Table */}
-      <div className="bg-white glass-card rounded-xl border border-stone-200 dark:border-white/5 overflow-hidden">
+      <div className="bg-white dark:bg-white/5 glass-card rounded-xl border border-stone-200 dark:border-white/5 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>

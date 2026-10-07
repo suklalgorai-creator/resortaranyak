@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -32,15 +32,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         />
       )}
 
-      <aside className={`fixed top-0 left-0 h-full w-64 bg-white glass-card border-r border-stone-200 dark:border-stone-800 z-50 transform transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="p-6 border-b border-stone-200 dark:border-stone-800">
+      <aside className={`fixed top-0 left-0 h-full w-64 bg-white dark:bg-white/5 glass-card border-r border-stone-200 dark:border-stone-800 z-50 transform transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto flex flex-col ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-6 border-b border-stone-200 dark:border-stone-800 shrink-0">
           <Link href="/admin/dashboard" className="block">
             <h1 className="font-serif text-xl font-bold text-green-800 dark:text-green-400">Resort Arranyak</h1>
             <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">Admin Panel</p>
           </Link>
         </div>
 
-        <nav className="p-4 flex flex-col gap-1">
+        <nav className="p-4 flex flex-col gap-1 flex-1 overflow-y-auto">
           {sidebarLinks.map((link) => {
             const isActive = pathname === link.href || pathname?.startsWith(link.href + '/');
             const Icon = link.icon;
@@ -62,7 +62,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           })}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-stone-200 dark:border-stone-800">
+        <div className="p-4 border-t border-stone-200 dark:border-stone-800 shrink-0">
           <Link href="/" className="flex items-center gap-2 px-4 py-2 text-sm text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300 transition-colors">
             <ArrowLeft className="w-4 h-4" /> Back to Website
           </Link>
@@ -70,7 +70,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       <div className="flex-1 flex flex-col min-h-screen">
-        <header className="sticky top-0 z-30 bg-white glass-card border-b border-stone-200 dark:border-stone-800 px-4 lg:px-8 py-4 flex items-center justify-between">
+        <header className="sticky top-0 z-30 bg-white dark:bg-white/5 glass-card border-b border-stone-200 dark:border-stone-800 px-4 lg:px-8 py-4 flex items-center justify-between">
           <button
             onClick={() => setSidebarOpen(true)}
             className="lg:hidden p-2 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg"

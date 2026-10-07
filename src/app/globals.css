@@ -10,25 +10,85 @@
   --color-gold-light: var(--gold-light);
   --color-forest: var(--forest);
   --color-sand: var(--sand);
+  --color-heading: var(--heading);
+  --color-bodytext: var(--bodytext);
 }
 
 @layer base {
   :root {
-    --background: hsl(40 20% 97%);
-    --foreground: hsl(222.2 84% 4.9%);
-    --forest: hsl(152 40% 20%);
-    --sand: hsl(40 20% 97%);
-    --border: hsl(214.3 31.8% 91.4%);
-    --gold: hsl(43 74% 49%);
-    --gold-light: hsl(43 74% 65%);
+    color-scheme: light;
+    --background: #fdfbf7;
+    --foreground: #1a1a1a;
+    --forest: #1e4a36;
+    --sand: #fdfbf7;
+    --border: #e2e8f0;
+    --gold: #d69e20;
+    --gold-light: #e3bb59;
+    --heading: #1e4a36;
+    --bodytext: #374151;
+
+    /* Glass tokens */
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-blur: 12px;
+    --glass-border: rgba(255, 255, 255, 0.3);
+
+    /* Glass card tokens */
+    --glass-card-bg: rgba(245, 245, 245, 0.5);
+    --glass-card-border: rgba(0, 0, 0, 0.06);
+    --glass-card-hover-bg: rgba(240, 240, 240, 0.7);
+    --glass-card-hover-border: rgba(0, 0, 0, 0.1);
+
+    /* Glass section tokens */
+    --glass-section-bg: rgba(255, 255, 255, 0.6);
+    --glass-section-border: rgba(0, 0, 0, 0.05);
+    --glass-section-shadow: rgba(0, 0, 0, 0.05);
+
+    /* Body dark-mode background pattern (none for light) */
+    --body-bg-color: #fdfbf7;
+    --body-bg-image: none;
+
+    /* Nature pattern opacity */
+    --nature-before-opacity: 0.04;
+    --nature-after-opacity: 0.03;
   }
 
   .dark {
-    --background: hsl(0 0% 7%);
-    --foreground: hsl(0 0% 95%);
-    --forest: hsl(152 45% 65%);
-    --sand: hsl(0 0% 10%);
-    --border: rgba(255, 255, 255, 0.08);
+    color-scheme: dark;
+    --background: #121212;
+    --foreground: #f2f2f2;
+    --forest: #77cca3;
+    --sand: #1a1a1a;
+    --border: #333333;
+    --heading: #e5e7eb;
+    --bodytext: #d1d5db;
+
+    /* Glass tokens - dark */
+    --glass-bg: rgba(20, 20, 20, 0.6);
+    --glass-blur: 16px;
+    --glass-border: rgba(255, 255, 255, 0.06);
+
+    /* Glass card tokens - dark */
+    --glass-card-bg: rgba(255, 255, 255, 0.03);
+    --glass-card-border: rgba(255, 255, 255, 0.06);
+    --glass-card-hover-bg: rgba(255, 255, 255, 0.06);
+    --glass-card-hover-border: rgba(255, 255, 255, 0.1);
+
+    /* Glass section tokens - dark */
+    --glass-section-bg: rgba(15, 25, 20, 0.65);
+    --glass-section-border: rgba(255, 255, 255, 0.05);
+    --glass-section-shadow: rgba(0, 0, 0, 0.3);
+
+    /* Body dark-mode background */
+    --body-bg-color: hsl(0 0% 7%);
+    --body-bg-image:
+      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
+      radial-gradient(ellipse at 20% 50%, rgba(16, 85, 55, 0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(180, 130, 20, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 100%, rgba(10, 60, 40, 0.12) 0%, transparent 50%);
+
+    /* Nature pattern opacity - dark */
+    --nature-before-opacity: 0.06;
+    --nature-after-opacity: 0.05;
   }
 
   * {
@@ -36,75 +96,122 @@
   }
 
   body {
-    background-color: var(--background);
+    background-color: var(--body-bg-color);
+    background-image: var(--body-bg-image);
+    background-attachment: fixed;
     color: var(--foreground);
   }
 
   h1, h2, h3, h4, h5, h6 {
-    color: var(--forest);
+    color: var(--heading);
   }
 }
 
-/* ===== GLASSMORPHISM SYSTEM ===== */
+/* ===== GLASSMORPHISM SYSTEM (token-driven, no .dark nesting) ===== */
 
-/* Light mode glass */
 .glass {
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.glass-card {
+  background: var(--glass-card-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--glass-card-border);
 }
 
-/* Dark mode - GLOBAL GLASS */
-.dark body {
-  background-image:
-    radial-gradient(ellipse at 20% 50%, rgba(16, 85, 55, 0.15) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(180, 130, 20, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 100%, rgba(10, 60, 40, 0.12) 0%, transparent 50%);
-  background-color: hsl(0 0% 7%);
-  background-attachment: fixed;
+.glass-card:hover {
+  background: var(--glass-card-hover-bg);
+  border-color: var(--glass-card-hover-border);
 }
 
-.dark .glass {
-  background: rgba(20, 20, 20, 0.6);
+.glass-section {
+  background: var(--glass-section-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--glass-section-border);
+  border-bottom: 1px solid var(--glass-section-border);
+  box-shadow: 0 8px 32px 0 var(--glass-section-shadow);
 }
 
-/* Glass Card - for sections and cards in dark mode */
-.dark .glass-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+.glass-input {
+  background: var(--glass-card-bg);
+  border: 1px solid var(--glass-card-border);
+  color: var(--foreground);
 }
 
-.dark .glass-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-/* Glass Section - for full-width sections */
-.dark .glass-section {
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-/* Glass input fields */
-.dark .glass-input {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
-}
-
-.dark .glass-input:focus {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
+.glass-input:focus {
+  background: var(--glass-card-hover-bg);
+  border-color: var(--glass-card-hover-border);
   outline: none;
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+/* ===== NATURE ART PATTERNS (token-driven opacity) ===== */
+
+.nature-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.nature-bg::before,
+.nature-bg::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Top-right decorative leaf cluster */
+.nature-bg::before {
+  top: -20px;
+  right: -40px;
+  width: 300px;
+  height: 300px;
+  opacity: var(--nature-before-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300' fill='none' stroke='%23a0c4a0' stroke-width='1.2'%3E%3Cpath d='M150 280C150 280 80 220 60 150C40 80 80 20 150 20C220 20 260 80 240 150C220 220 150 280 150 280Z'/%3E%3Cpath d='M150 280L150 20'/%3E%3Cpath d='M150 60C120 80 100 100 90 130'/%3E%3Cpath d='M150 60C180 80 200 100 210 130'/%3E%3Cpath d='M150 120C125 140 110 160 105 185'/%3E%3Cpath d='M150 120C175 140 190 160 195 185'/%3E%3Cpath d='M150 180C135 195 120 210 115 230'/%3E%3Cpath d='M150 180C165 195 180 210 185 230'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+/* Bottom-left decorative fern */
+.nature-bg::after {
+  bottom: -30px;
+  left: -50px;
+  width: 350px;
+  height: 350px;
+  opacity: var(--nature-after-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 350 350' fill='none' stroke='%23d4af37' stroke-width='1'%3E%3Cpath d='M50 320C50 320 80 250 120 200C160 150 220 100 280 60'/%3E%3Cpath d='M80 280C100 260 90 230 70 220'/%3E%3Cpath d='M110 240C130 220 120 190 100 180'/%3E%3Cpath d='M140 200C160 180 150 150 130 140'/%3E%3Cpath d='M170 170C190 150 180 120 160 110'/%3E%3Cpath d='M200 140C220 120 210 90 190 80'/%3E%3Cpath d='M230 110C250 90 240 60 220 50'/%3E%3Cpath d='M100 260C80 250 60 260 55 280'/%3E%3Cpath d='M130 225C110 215 90 225 85 245'/%3E%3Cpath d='M160 185C140 175 120 185 115 205'/%3E%3Cpath d='M190 150C170 140 150 150 145 170'/%3E%3Cpath d='M220 120C200 110 180 120 175 140'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  transform: rotate(15deg);
+}
+
+/* Bamboo border accent — thin vertical lines on sides */
+.nature-border {
+  position: relative;
+}
+.nature-border::before {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 0;
+  width: 2px;
+  height: 80%;
+  background: linear-gradient(to bottom, transparent, rgba(160, 196, 160, 0.15), rgba(212, 175, 55, 0.1), transparent);
+}
+.nature-border::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  right: 0;
+  width: 2px;
+  height: 80%;
+  background: linear-gradient(to bottom, transparent, rgba(160, 196, 160, 0.15), rgba(212, 175, 55, 0.1), transparent);
 }

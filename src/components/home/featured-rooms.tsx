@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 
 export default function FeaturedRooms() {
   return (
-    <section className="py-12 md:py-24 bg-stone-50 glass-section px-4 sm:px-6 lg:px-8">
+    <section className="py-12 md:py-24 bg-stone-50 dark:bg-stone-900/20/50 glass-section px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
@@ -31,12 +31,12 @@ export default function FeaturedRooms() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.2 }}
-              className="bg-white glass-card rounded-lg overflow-hidden shadow-md dark:shadow-none hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1"
+              className="bg-white dark:bg-white/5 glass-card rounded-lg overflow-hidden shadow-md dark:shadow-none hover:shadow-2xl transition-all duration-300 group transform hover:-translate-y-1"
             >
               {/* Image */}
               <div className="h-64 w-full relative overflow-hidden">
                 <img src={room.image} alt={room.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                <div className="absolute top-4 right-4 bg-white/90 dark:bg-stone-800/90 dark:text-stone-200 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold text-forest shadow-sm">
+                <div className="absolute top-4 right-4 bg-white dark:bg-white/5/90 dark:bg-stone-800/90 dark:text-stone-200 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold text-forest shadow-sm">
                   {room.capacity}
                 </div>
               </div>

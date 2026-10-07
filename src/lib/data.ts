@@ -1,19 +1,19 @@
-export const featuredRooms = [
+﻿export const featuredRooms = [
   {
     id: 'deluxe-room',
     name: 'Deluxe Room',
-    description: 'A cozy and elegant room with modern amenities and a private balcony overlooking the forest.',
+    description: 'A cozy and elegant room with modern amenities and air conditioning for a comfortable stay.',
     price: '2,500',
     capacity: '2 Guests',
-    image: 'https://aranyakresortghatsila.com/wp-content/uploads/2023/01/Deluxe2.jpg',
+    image: '/room-1.jpg',
   },
   {
-    id: 'nature-room',
-    name: 'Nature Room',
-    description: 'Experience nature at its best with panoramic views, and premium furnishings.',
-    price: '3,500',
-    capacity: '3 Guests',
-    image: 'https://aranyakresortghatsila.com/wp-content/uploads/2023/02/Nature2.jpg',
+    id: 'luxury-tent',
+    name: 'Luxury Forest Tent',
+    description: 'Experience glamping at its best with cozy tents surrounded by lush green lawns and nature.',
+    price: '2,000',
+    capacity: '2 Guests',
+    image: '/room-2.jpg',
   },
   {
     id: 'family-cottage',
@@ -21,12 +21,12 @@ export const featuredRooms = [
     description: 'An independent cottage perfect for families, offering privacy, ample space, and garden access.',
     price: '4,500',
     capacity: '5 Guests',
-    image: 'https://aranyakresortghatsila.com/wp-content/uploads/2023/02/Family2-1.jpg',
+    image: '/gallery-1.jpg',
   },
 ];
 
 export const amenities = [
-  'Boating', 'Swimming Pool', 'Water Games', 'Water Sports', 'Restaurant', 'Room Service', 'Safe Pick & Drop'
+  'Boating', 'Swimming Pool', 'Water Games', 'Water Sports', 'Restaurant', 'Room Service', 'Safe Pick & Drop', 'Garden & Lawn'
 ];
 
 export const testimonials = [
@@ -39,7 +39,7 @@ export const testimonials = [
   },
   {
     id: 2,
-    name: 'vibek kumar singh',
+    name: 'Vibek Kumar Singh',
     location: 'Guest',
     quote: 'Good service and tasty food. Good picnic experience.',
     rating: 5,
@@ -54,10 +54,15 @@ export const testimonials = [
 ];
 
 export const galleryImages = [
-  { id: 1, label: 'Deluxe Room', image: 'https://aranyakresortghatsila.com/wp-content/uploads/2023/01/Deluxe2.jpg', className: 'col-span-1 md:col-span-2 row-span-2 md:h-96' },
-  { id: 2, label: 'Nature', image: 'https://aranyakresortghatsila.com/wp-content/uploads/2023/02/Nature2.jpg', className: 'col-span-1 md:col-span-1 row-span-1 h-48 md:h-auto' },
-  { id: 3, label: 'Family Time', image: 'https://aranyakresortghatsila.com/wp-content/uploads/2023/02/Family2-1.jpg', className: 'col-span-1 md:col-span-1 row-span-1 h-48 md:h-auto' },
-  { id: 4, label: 'Comfort', image: 'https://aranyakresortghatsila.com/wp-content/uploads/2023/01/Deluxe2.jpg', className: 'col-span-1 md:col-span-1 row-span-1 h-48 md:h-auto' },
-  { id: 5, label: 'Relaxation', image: 'https://aranyakresortghatsila.com/wp-content/uploads/2023/02/Nature2.jpg', className: 'col-span-1 md:col-span-2 row-span-1 h-48 md:h-auto' },
-  { id: 6, label: 'Gathering', image: 'https://aranyakresortghatsila.com/wp-content/uploads/2023/02/Family2-1.jpg', className: 'col-span-1 md:col-span-1 row-span-1 h-48 md:h-auto' },
+  { id: 1, url: '/hero-resort.jpg', caption: 'Resort Entrance', className: 'col-span-1 md:col-span-2 row-span-2 md:h-96' },
+  { id: 2, url: '/gallery-1.jpg', caption: 'Garden Pathway', className: 'col-span-1 md:col-span-1 row-span-1 h-48 md:h-auto' },
+  { id: 3, url: '/gallery-2.jpg', caption: 'Lawn & Seating', className: 'col-span-1 md:col-span-1 row-span-1 h-48 md:h-auto' },
+  { id: 4, url: '/gallery-3.jpg', caption: 'Resort Gate with Indian Flag', className: 'col-span-1 md:col-span-1 row-span-1 h-48 md:h-auto' },
+  { id: 5, url: '/room-1.jpg', caption: 'Deluxe Room', className: 'col-span-1 md:col-span-1 row-span-1 h-48 md:h-auto' },
+  { id: 6, url: '/room-2.jpg', caption: 'Luxury Forest Tents', className: 'col-span-1 md:col-span-2 row-span-1 h-48 md:h-auto' },
+  { id: 7, url: '/gallery-4.jpg', caption: 'Mountain View Garden', className: 'col-span-1 md:col-span-1 row-span-1 h-48 md:h-auto' },
+  { id: 8, url: '/gallery-5.jpg', caption: 'Dining Area', className: 'col-span-1 md:col-span-1 row-span-1 h-48 md:h-auto' },
+  { id: 9, url: '/gallery-6.jpg', caption: 'Flower Garden', className: 'col-span-1 md:col-span-2 row-span-2 md:h-96' },
+  { id: 10, url: '/gallery-7.jpg', caption: 'Sunset View', className: 'col-span-1 md:col-span-1 row-span-1 h-48 md:h-auto' },
+  { id: 11, url: '/gallery-8.jpg', caption: 'Outdoor Seating', className: 'col-span-1 md:col-span-1 row-span-1 h-48 md:h-auto' },
 ];

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from 'next/link';
 import { galleryImages } from '@/lib/data';
@@ -21,14 +21,14 @@ const itemVariants = {
 
 export default function GalleryPreview() {
   return (
-    <section className="py-12 md:py-24 bg-stone-100 px-4 sm:px-6 lg:px-8">
+    <section className="py-12 md:py-24 bg-stone-100 glass-section nature-bg px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
           <div>
-            <h2 className="font-serif text-3xl md:text-5xl text-forest mb-4 font-semibold">
+            <h2 className="font-serif text-3xl md:text-5xl text-heading mb-4 font-semibold">
               Glimpses of Arranyak
             </h2>
-            <p className="text-stone-600 max-w-xl">
+            <p className="text-bodytext max-w-xl">
               Take a visual journey through our lush resort grounds, elegant accommodations, and serene surroundings.
             </p>
           </div>
@@ -57,7 +57,7 @@ export default function GalleryPreview() {
               className={`relative rounded-lg overflow-hidden group cursor-pointer ${item.className}`}
             >
               {/* Image */}
-              <img src={item.image} alt={item.label} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+              <img src={item.url} alt={item.caption} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
               
               {/* Overlay with subtle gold tint */}
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/60 transition-colors duration-500" />
@@ -69,7 +69,7 @@ export default function GalleryPreview() {
                   </svg>
                 </span>
                 <h3 className="text-white font-serif font-medium text-xl tracking-wide text-center">
-                  {item.label}
+                  {item.caption}
                 </h3>
               </div>
             </motion.div>

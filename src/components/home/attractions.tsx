@@ -1,3 +1,9 @@
+'use client';
+
+import { SectionHeader } from '@/components/ui/section-header';
+import { Badge } from '@/components/ui/badge';
+import { motion } from 'framer-motion';
+
 const ATTRACTIONS = [
   {
     name: 'Burudih Lake',
@@ -33,10 +39,10 @@ const ATTRACTIONS = [
 
 export default function Attractions() {
   return (
-    <section className="py-12 md:py-24 bg-white glass-section px-4 sm:px-6 lg:px-8 border-y border-stone-100 dark:border-stone-800">
+    <section className="py-12 md:py-24 bg-transparent glass-section nature-bg px-4 sm:px-6 lg:px-8 border-y border-stone-100 dark:border-stone-800">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="font-serif text-3xl md:text-5xl text-green-900 dark:text-stone-200 mb-4 font-semibold">
+          <h2 className="font-serif text-3xl md:text-5xl text-heading dark:text-stone-200 mb-4 font-semibold">
             Explore the Neighbourhood
           </h2>
           <p className="text-stone-600 dark:text-stone-400 max-w-2xl mx-auto">
@@ -46,22 +52,26 @@ export default function Attractions() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {ATTRACTIONS.map((attraction, index) => (
-            <div 
+            <motion.div 
               key={index}
-              className="border border-stone-200 rounded-lg p-6 hover:border-green-300 hover:bg-green-50/50 transition-colors duration-300 group glass-card"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="border border-stone-200 rounded-lg p-6 hover:border-gold/30 hover:bg-gold/5 transition-colors duration-300 group glass-card"
             >
               <div className="flex justify-between items-start mb-3">
-                <h3 className="font-semibold text-lg text-green-900 dark:text-stone-200 group-hover:text-green-700">
+                <h3 className="font-semibold text-lg text-heading dark:text-stone-200 group-hover:text-gold">
                   {attraction.name}
                 </h3>
                 <span className="inline-block px-2 py-1 bg-stone-100 text-stone-600 dark:text-stone-400 text-xs font-medium rounded-sm group-hover:bg-green-100 group-hover:text-green-800 transition-colors">
                   {attraction.distance}
                 </span>
               </div>
-              <p className="text-stone-600 dark:text-stone-400 text-sm leading-relaxed">
+              <p className="text-bodytext text-sm leading-relaxed">
                 {attraction.description}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

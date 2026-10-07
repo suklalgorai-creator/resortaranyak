@@ -23,7 +23,7 @@ export default function AdminGalleryPage() {
       </div>
 
       {/* Upload Area */}
-      <div className="bg-white glass-card rounded-xl border-2 border-dashed border-stone-300 dark:border-white/10 p-12 text-center hover:border-green-400 dark:hover:border-green-500/30 transition-colors cursor-pointer">
+      <div className="bg-white dark:bg-white/5 glass-card rounded-xl border-2 border-dashed border-stone-300 dark:border-white/10 p-12 text-center hover:border-green-400 dark:hover:border-green-500/30 transition-colors cursor-pointer">
         <div className="text-4xl mb-3">??</div>
         <p className="text-stone-600 dark:text-stone-400 font-medium">Drag and drop images here</p>
         <p className="text-sm text-stone-400 dark:text-stone-500 mt-1">or click to browse (JPG, PNG, WebP up to 5MB)</p>

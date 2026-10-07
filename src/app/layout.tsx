@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
@@ -6,6 +6,14 @@ import { LayoutWrapper } from '@/components/layout/layout-wrapper';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
+
+export const viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: 'white' },
+    { media: '(prefers-color-scheme: dark)', color: '#0a0f0d' },
+  ],
+  colorScheme: 'light dark',
+};
 
 export const metadata: Metadata = {
   title: 'Resort Arranyak | Premium Nature Resort near Ghatsila',

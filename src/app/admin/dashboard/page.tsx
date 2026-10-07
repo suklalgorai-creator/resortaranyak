@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { CalendarDays, IndianRupee, MessageSquare, Hotel, Plus, Camera } from 'lucide-react';
 import Link from 'next/link';
@@ -36,7 +36,7 @@ export default function AdminDashboard() {
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.label} className="bg-white glass-card rounded-xl p-6 border border-stone-200 dark:border-stone-800 hover:shadow-md transition-shadow">
+            <div key={stat.label} className="bg-white dark:bg-white/5 glass-card rounded-xl p-6 border border-stone-200 dark:border-stone-800 hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between mb-4">
                 <span className={`p-2.5 rounded-lg ${stat.color}`}>
                   <Icon className="w-5 h-5" />
@@ -62,7 +62,7 @@ export default function AdminDashboard() {
         </Link>
       </div>
 
-      <div className="bg-white glass-card rounded-xl border border-stone-200 dark:border-stone-800">
+      <div className="bg-white dark:bg-white/5 glass-card rounded-xl border border-stone-200 dark:border-stone-800">
         <div className="p-6 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
           <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">Recent Bookings</h2>
           <Link href="/admin/bookings" className="text-sm text-green-600 dark:text-green-400 hover:underline">View All &rarr;</Link>

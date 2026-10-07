@@ -17,7 +17,7 @@ export default function AdminLoginPage() {
           <p className="text-stone-500 dark:text-stone-400 mt-2">Admin Login</p>
         </div>
 
-        <div className="bg-white glass-card rounded-2xl border border-stone-200 dark:border-white/5 p-8 shadow-lg">
+        <div className="bg-white dark:bg-white/5 glass-card rounded-2xl border border-stone-200 dark:border-white/5 p-8 shadow-lg">
           <form onSubmit={(e) => e.preventDefault()} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">Email</label>

@@ -20,7 +20,7 @@ export default function AdminRoomsPage() {
       </div>
 
       {/* Rooms Table */}
-      <div className="bg-white glass-card rounded-xl border border-stone-200 dark:border-white/5 overflow-hidden">
+      <div className="bg-white dark:bg-white/5 glass-card rounded-xl border border-stone-200 dark:border-white/5 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -41,7 +41,7 @@ export default function AdminRoomsPage() {
                       <img src={room.image} alt={room.name} className="w-14 h-14 rounded-lg object-cover" />
                       <div>
                         <p className="font-medium text-stone-800 dark:text-stone-200 text-sm">{room.name}</p>
-                        <p className="text-xs text-stone-500 dark:text-stone-400">{room.bedType}</p>
+                        <p className="text-xs text-stone-500 dark:text-stone-400">King/Twin Bed</p>
                       </div>
                     </div>
                   </td>

@@ -7,4 +7,97 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Models will be added in Phase 2
+// ─── Admin User ───
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("ADMIN")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Room / Accommodation ───
+model Room {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  name           String
+  description    String
+  pricePerNight  Int       // stored in INR (not paisa)
+  maxGuests      Int
+  bedType        String    @default("King Bed")
+  roomSize       String?
+  inventoryCount Int       @default(1) // how many of this room type exist
+  images         String[]  // array of image URLs
+  amenities      String[]  // room-specific amenities
+  status         String    @default("AVAILABLE") // AVAILABLE, MAINTENANCE, DEACTIVATED
+  featured       Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  bookings Booking[]
+
+  @@index([status])
+  @@index([featured])
+}
+
+// ─── Booking ───
+model Booking {
+  id            String   @id @default(cuid())
+  bookingCode   String   @unique @default(cuid()) // human-friendly booking reference
+  roomId        String
+  room          Room     @relation(fields: [roomId], references: [id])
+  checkIn       DateTime
+  checkOut      DateTime
+  nights        Int
+  guests        Int
+  totalAmount   Int      // in INR
+  status        String   @default("PENDING") // PENDING, PAYMENT_PENDING, CONFIRMED, CANCELLED, COMPLETED
+
+  // Guest details (no login required for customers)
+  guestName     String
+  guestEmail    String
+  guestPhone    String
+  specialRequests String?
+
+  payment   Payment?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([roomId])
+  @@index([status])
+  @@index([checkIn, checkOut])
+  @@index([guestEmail])
+}
+
+// ─── Payment ───
+model Payment {
+  id                 String   @id @default(cuid())
+  bookingId          String   @unique
+  booking            Booking  @relation(fields: [bookingId], references: [id])
+  razorpayOrderId    String   @unique
+  razorpayPaymentId  String?
+  razorpaySignature  String?
+  amount             Int      // in paisa (INR * 100)
+  currency           String   @default("INR")
+  status             String   @default("CREATED") // CREATED, PENDING, PAID, FAILED, REFUNDED
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([razorpayOrderId])
+}
+
+// ─── Enquiry (Contact Form) ───
+model Enquiry {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  message   String
+  status    String   @default("UNREAD") // UNREAD, READ, REPLIED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}

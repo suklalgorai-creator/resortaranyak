@@ -20,6 +20,12 @@ export const ROOM_STATUS = {
   DEACTIVATED: 'DEACTIVATED',
 } as const;
 
+export const ENQUIRY_STATUS = {
+  UNREAD: 'UNREAD',
+  READ: 'READ',
+  REPLIED: 'REPLIED',
+} as const;
+
 export const SITE_CONFIG = {
   name: 'Resort Arranyak',
   description: 'A premium resort near Ghatsila, Jharkhand',
