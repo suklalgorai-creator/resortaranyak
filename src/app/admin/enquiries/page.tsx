@@ -1,72 +1,38 @@
 'use client';
 
-import { useState } from 'react';
-import { Mail, Phone, CalendarDays } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-const initialEnquiries = [
-  { id: 1, name: 'Raju Mishra', email: 'raju@gmail.com', phone: '+91-9988776655', message: 'Hi, I want to know about group booking for 20 people in November.', date: '2026-09-01', isRead: false },
-  { id: 2, name: 'Anita Sinha', email: 'anita@gmail.com', phone: '+91-8877665544', message: 'Do you have any special Diwali packages? We are a family of 4.', date: '2026-09-02', isRead: false },
-  { id: 3, name: 'Deepak Ghosh', email: 'deepak@gmail.com', phone: '+91-7766554433', message: 'Is swimming pool available in September? Also, do you serve Bengali food?', date: '2026-09-03', isRead: true },
-  { id: 4, name: 'Kavita Roy', email: 'kavita@gmail.com', phone: '+91-6655443322', message: 'I need a wheelchair accessible room. Do you have ground floor options?', date: '2026-09-04', isRead: true },
-];
+type Enquiry = { id: string; name: string; email: string; phone: string | null; message: string; status: string; createdAt: string };
 
 export default function AdminEnquiriesPage() {
-  const [items, setItems] = useState(initialEnquiries);
+  const [items, setItems] = useState<Enquiry[]>([]);
+  const [error, setError] = useState('');
 
-  const markAsRead = (id: number) => {
-    setItems(items.map(item => item.id === id ? { ...item, isRead: true } : item));
-  };
+  async function load() {
+    const response = await fetch('/api/admin/enquiries');
+    const result = await response.json() as { success: boolean; data?: { data: Enquiry[] }; error?: string };
+    if (!response.ok || !result.data) throw new Error(result.error || 'Unable to load enquiries');
+    setItems(result.data.data);
+  }
 
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-stone-800 dark:text-stone-100">Enquiries</h1>
-        <p className="text-stone-500 dark:text-stone-400 mt-1">Contact form submissions ({items.filter(i => !i.isRead).length} unread)</p>
-      </div>
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/admin/enquiries')
+      .then(async (response) => {
+        const result = await response.json() as { success: boolean; data?: { data: Enquiry[] }; error?: string };
+        if (!response.ok || !result.data) throw new Error(result.error || 'Unable to load enquiries');
+        if (!cancelled) setItems(result.data.data);
+      })
+      .catch((loadError) => { if (!cancelled) setError(loadError instanceof Error ? loadError.message : 'Unable to load enquiries'); });
+    return () => { cancelled = true; };
+  }, []);
 
-      <div className="space-y-4">
-        {items.map((enq) => (
-          <div key={enq.id} className={`bg-white dark:bg-white/5 glass-card rounded-xl border p-6 transition-all ${
-            enq.isRead
-              ? 'border-stone-200 dark:border-white/5'
-              : 'border-gold/40 dark:border-gold/20 ring-1 ring-gold/10'
-          }`}>
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h3 className="font-bold text-lg text-stone-800 dark:text-stone-100">{enq.name}</h3>
-                  {!enq.isRead && (
-                    <span className="text-[10px] uppercase font-bold tracking-wider bg-gold text-stone-900 px-2 py-0.5 rounded-full">New</span>
-                  )}
-                </div>
-                <p className="text-stone-700 dark:text-stone-300 mb-4">{enq.message}</p>
-                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-stone-500 dark:text-stone-400">
-                  <span className="flex items-center gap-1.5"><Mail className="w-4 h-4" /> {enq.email}</span>
-                  <span className="flex items-center gap-1.5"><Phone className="w-4 h-4" /> {enq.phone}</span>
-                  <span className="flex items-center gap-1.5"><CalendarDays className="w-4 h-4" /> {enq.date}</span>
-                </div>
-              </div>
-              <div className="flex sm:flex-col items-center gap-2 shrink-0">
-                {!enq.isRead && (
-                  <button
-                    onClick={() => markAsRead(enq.id)}
-                    className="text-xs px-4 py-2 rounded-lg border border-stone-300 dark:border-stone-600 hover:bg-stone-50 dark:hover:bg-white/5 text-stone-600 dark:text-stone-300 transition-colors font-medium w-full"
-                  >
-                    Mark as Read
-                  </button>
-                )}
-                <a
-                  href={`https://wa.me/${enq.phone.replace(/[^0-9]/g, '')}`}
-                  target="_blank"
-                  className="text-xs px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors font-medium text-center w-full"
-                >
-                  Reply on WhatsApp
-                </a>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  async function markAsRead(id: string) {
+    const response = await fetch('/api/admin/enquiries', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+    const result = await response.json() as { success: boolean; error?: string };
+    if (!response.ok || !result.success) throw new Error(result.error || 'Unable to update enquiry');
+    await load();
+  }
+
+  return <div className="space-y-6"><div><h1 className="text-2xl lg:text-3xl font-bold text-stone-800 dark:text-stone-100">Enquiries</h1><p className="text-stone-500 mt-1">Live contact submissions</p></div>{error && <p role="alert" className="rounded-lg bg-red-50 p-4 text-red-700">{error}</p>}<div className="space-y-4">{items.map((enquiry) => <article key={enquiry.id} className={`rounded-xl border bg-white p-6 dark:bg-white/5 ${enquiry.status === 'UNREAD' ? 'border-gold' : ''}`}><div className="flex flex-col gap-4 sm:flex-row sm:justify-between"><div><h2 className="text-lg font-bold">{enquiry.name} {enquiry.status === 'UNREAD' && <span className="ml-2 rounded bg-gold px-2 py-1 text-xs">New</span>}</h2><p className="mt-3 whitespace-pre-wrap text-stone-700 dark:text-stone-300">{enquiry.message}</p><p className="mt-4 text-sm text-stone-500">{enquiry.email}{enquiry.phone ? ` · ${enquiry.phone}` : ''} · {new Date(enquiry.createdAt).toLocaleString()}</p></div>{enquiry.status === 'UNREAD' && <button onClick={() => markAsRead(enquiry.id).catch((updateError) => setError(updateError instanceof Error ? updateError.message : 'Unable to update enquiry'))} className="h-fit rounded-lg border px-4 py-2 text-sm">Mark as read</button>}</div></article>)}</div></div>;
 }

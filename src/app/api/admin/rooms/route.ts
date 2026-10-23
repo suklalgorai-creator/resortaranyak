@@ -4,10 +4,11 @@ import { roomService } from '@/services/room.service';
 import { createRoomSchema } from '@/validations/room.schema';
 import { AppError } from '@/lib/errors';
 import { z } from 'zod/v4';
+import { hasAdminRole } from '@/lib/authz';
 
 export async function GET() {
   const session = await auth();
-  if (!session || (session.user as { role?: string })?.role !== 'ADMIN') {
+  if (!session || !(await hasAdminRole(session.user?.id))) {
     return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
   }
 
@@ -24,7 +25,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session || (session.user as { role?: string })?.role !== 'ADMIN') {
+  if (!session || !(await hasAdminRole(session.user?.id))) {
     return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
   }
 

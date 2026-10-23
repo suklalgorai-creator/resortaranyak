@@ -1,7 +1,11 @@
+'use client';
+
+import { siteConfig } from '@/config/site';
+
 export default function WhatsAppButton() {
   return (
     <a
-      href="https://wa.me/91XXXXXXXXXX"
+      href={siteConfig.links.whatsapp}
       target="_blank"
       rel="noopener noreferrer"
       className="fixed bottom-8 md:bottom-10 right-4 md:right-6 z-50 flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 hover:scale-110 transition-all duration-300 group"

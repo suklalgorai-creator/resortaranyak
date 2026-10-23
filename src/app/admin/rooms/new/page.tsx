@@ -1,115 +1,25 @@
 'use client';
 
-import { ArrowLeft, Upload, Save, X } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
-
-const availableAmenities = [
-  'Free WiFi', 'Air Conditioning', 'Flat-screen TV', 'Mini Fridge', 
-  'Room Service', 'Balcony', 'Geyser/Hot Water', 'Tea/Coffee Maker'
-];
+import { useRouter } from 'next/navigation';
 
 export default function AddRoomPage() {
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const router = useRouter();
+  const [form, setForm] = useState({ name: '', description: '', pricePerNight: '2500', maxGuests: '2', inventoryCount: '1', bedType: 'King Bed', roomSize: '', status: 'AVAILABLE' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const toggleAmenity = (amenity: string) => {
-    if (selectedAmenities.includes(amenity)) {
-      setSelectedAmenities(selectedAmenities.filter(a => a !== amenity));
-    } else {
-      setSelectedAmenities([...selectedAmenities, amenity]);
-    }
-  };
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setLoading(true); setError('');
+    try {
+      const response = await fetch('/api/admin/rooms', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, pricePerNight: Number(form.pricePerNight), maxGuests: Number(form.maxGuests), inventoryCount: Number(form.inventoryCount), images: [], amenities: [] }) });
+      const result = await response.json() as { success: boolean; error?: string };
+      if (!response.ok || !result.success) throw new Error(result.error || 'Unable to create room');
+      router.push('/admin/rooms');
+    } catch (submitError) { setError(submitError instanceof Error ? submitError.message : 'Unable to create room'); setLoading(false); }
+  }
 
-  return (
-    <div className="space-y-6 max-w-4xl mx-auto">
-      <div className="flex items-center gap-4">
-        <Link href="/admin/rooms" className="p-2 rounded-lg bg-stone-100 dark:bg-white/5 hover:bg-stone-200 dark:hover:bg-white/10 text-stone-600 dark:text-stone-400 transition-colors">
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-stone-800 dark:text-stone-100">Add New Room</h1>
-          <p className="text-stone-500 dark:text-stone-400 mt-1">Create a new room listing for the resort</p>
-        </div>
-      </div>
-
-      <div className="bg-white dark:bg-white/5 glass-card rounded-xl border border-stone-200 dark:border-white/5 p-6 lg:p-8">
-        <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
-          
-          {/* Basic Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-stone-700 dark:text-stone-300">Room Name</label>
-              <input type="text" placeholder="e.g. Luxury Forest Tent" className="w-full px-4 py-2.5 rounded-lg border border-stone-300 dark:border-white/10 bg-transparent text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-green-500/50" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-stone-700 dark:text-stone-300">URL Slug</label>
-              <input type="text" placeholder="e.g. luxury-forest-tent" className="w-full px-4 py-2.5 rounded-lg border border-stone-300 dark:border-white/10 bg-transparent text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-green-500/50" />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-stone-700 dark:text-stone-300">Description</label>
-            <textarea rows={4} placeholder="Describe the room, views, and experience..." className="w-full px-4 py-2.5 rounded-lg border border-stone-300 dark:border-white/10 bg-transparent text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-green-500/50 resize-none"></textarea>
-          </div>
-
-          {/* Pricing & Capacity */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-stone-700 dark:text-stone-300">Price per Night (?)</label>
-              <input type="number" placeholder="e.g. 5000" className="w-full px-4 py-2.5 rounded-lg border border-stone-300 dark:border-white/10 bg-transparent text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-green-500/50" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-stone-700 dark:text-stone-300">Max Capacity</label>
-              <input type="number" placeholder="e.g. 3" className="w-full px-4 py-2.5 rounded-lg border border-stone-300 dark:border-white/10 bg-transparent text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-green-500/50" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-stone-700 dark:text-stone-300">Bed Type</label>
-              <input type="text" placeholder="e.g. 1 King Bed" className="w-full px-4 py-2.5 rounded-lg border border-stone-300 dark:border-white/10 bg-transparent text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-green-500/50" />
-            </div>
-          </div>
-
-          {/* Amenities */}
-          <div className="space-y-3">
-            <label className="text-sm font-medium text-stone-700 dark:text-stone-300">Room Amenities</label>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {availableAmenities.map(amenity => (
-                <button
-                  key={amenity}
-                  onClick={() => toggleAmenity(amenity)}
-                  type="button"
-                  className={`px-3 py-2 rounded-lg text-sm font-medium border text-left transition-colors ${
-                    selectedAmenities.includes(amenity)
-                      ? 'bg-green-50 dark:bg-green-900/20 border-green-500/50 text-green-700 dark:text-green-400'
-                      : 'border-stone-200 dark:border-white/10 text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-white/5'
-                  }`}
-                >
-                  {selectedAmenities.includes(amenity) ? '? ' : '+ '} {amenity}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Image Upload */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-stone-700 dark:text-stone-300">Room Images</label>
-            <div className="border-2 border-dashed border-stone-300 dark:border-white/10 rounded-xl p-8 text-center hover:border-green-400 transition-colors cursor-pointer bg-stone-50 dark:bg-white/5">
-              <Upload className="w-8 h-8 text-stone-400 mx-auto mb-3" />
-              <p className="text-sm font-medium text-stone-600 dark:text-stone-300">Click or drag images to upload</p>
-              <p className="text-xs text-stone-400 mt-1">Recommended size: 1200x800px (JPG/PNG)</p>
-            </div>
-          </div>
-
-          <div className="pt-6 border-t border-stone-200 dark:border-white/5 flex items-center justify-end gap-4">
-            <Link href="/admin/rooms" className="px-6 py-2.5 text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 transition-colors">
-              Cancel
-            </Link>
-            <button type="submit" className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors shadow-sm text-sm">
-              <Save className="w-4 h-4" /> Save Room
-            </button>
-          </div>
-
-        </form>
-      </div>
-    </div>
-  );
+  return <div className="mx-auto max-w-3xl space-y-6"><div><Link href="/admin/rooms" className="text-sm text-green-700">← Back to rooms</Link><h1 className="mt-3 text-2xl font-bold">Add room</h1></div><form onSubmit={submit} className="space-y-5 rounded-xl border bg-white p-6 dark:bg-white/5">{error && <p role="alert" className="rounded bg-red-50 p-3 text-red-700">{error}</p>}<label className="block text-sm font-medium">Name<input required maxLength={100} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="mt-1 w-full rounded border p-3" /></label><label className="block text-sm font-medium">Description<textarea required minLength={10} maxLength={5000} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="mt-1 w-full rounded border p-3" rows={5} /></label><div className="grid gap-4 sm:grid-cols-4">{[['pricePerNight','Price'],['maxGuests','Max guests'],['inventoryCount','Inventory']].map(([key,label]) => <label key={key} className="block text-sm font-medium">{label}<input required type="number" min="1" value={form[key as keyof typeof form]} onChange={(e) => setForm({ ...form, [key]: e.target.value })} className="mt-1 w-full rounded border p-3" /></label>)}<label className="block text-sm font-medium">Bed type<input required maxLength={50} value={form.bedType} onChange={(e) => setForm({ ...form, bedType: e.target.value })} className="mt-1 w-full rounded border p-3" /></label></div><button disabled={loading} className="rounded-lg bg-green-600 px-5 py-3 font-medium text-white disabled:opacity-50">{loading ? 'Saving…' : 'Save room'}</button></form></div>;
 }

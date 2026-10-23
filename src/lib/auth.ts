@@ -2,6 +2,7 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { prisma } from '@/lib/db';
 import bcrypt from 'bcryptjs';
+import { loginSchema } from '@/validations/auth.schema';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -12,18 +13,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        const parsed = loginSchema.safeParse(credentials);
+        if (!parsed.success) {
           return null;
         }
 
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
+          where: { email: parsed.data.email.toLowerCase() },
         });
 
         if (!user) return null;
 
         const isValid = await bcrypt.compare(
-          credentials.password as string,
+          parsed.data.password,
           user.password
         );
 

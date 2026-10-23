@@ -3,9 +3,9 @@ import { featuredRooms, amenities } from '@/lib/data';
 import { Check, Users, Maximize, Wifi, Coffee, Wind, ArrowLeft } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
-export default function RoomDetailsPage({ params }: { params: { slug: string } }) {
-  // Try to find the room in our dummy data, or fallback to a default premium layout
-  const room = featuredRooms.find(r => r.id === params.slug) || featuredRooms[0];
+export default async function RoomDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const room = featuredRooms.find(r => r.id === slug);
 
   if (!room) {
     notFound();

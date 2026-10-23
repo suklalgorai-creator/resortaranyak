@@ -7,34 +7,68 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ─── Admin User ───
+enum UserRole {
+  ADMIN
+}
+
+enum RoomStatus {
+  AVAILABLE
+  MAINTENANCE
+  DEACTIVATED
+}
+
+enum BookingStatus {
+  HOLD
+  PAYMENT_PENDING
+  CONFIRMED
+  CANCEL_REQUESTED
+  CANCELLED
+  EXPIRED
+  FAILED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  CREATED
+  AUTHORIZED
+  CAPTURED
+  FAILED
+  REFUND_PENDING
+  REFUNDED
+}
+
+enum EnquiryStatus {
+  UNREAD
+  READ
+  REPLIED
+}
+
 model User {
   id        String   @id @default(cuid())
   name      String
   email     String   @unique
   password  String
-  role      String   @default("ADMIN")
+  role      UserRole @default(ADMIN)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-// ─── Room / Accommodation ───
 model Room {
-  id             String    @id @default(cuid())
-  slug           String    @unique
+  id             String     @id @default(cuid())
+  slug           String     @unique
   name           String
   description    String
-  pricePerNight  Int       // stored in INR (not paisa)
+  pricePerNight  Int
   maxGuests      Int
-  bedType        String    @default("King Bed")
+  bedType        String     @default("King Bed")
   roomSize       String?
-  inventoryCount Int       @default(1) // how many of this room type exist
-  images         String[]  // array of image URLs
-  amenities      String[]  // room-specific amenities
-  status         String    @default("AVAILABLE") // AVAILABLE, MAINTENANCE, DEACTIVATED
-  featured       Boolean   @default(false)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  inventoryCount Int        @default(1)
+  images         String[]
+  amenities      String[]
+  status         RoomStatus @default(AVAILABLE)
+  featured       Boolean    @default(false)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
 
   bookings Booking[]
 
@@ -42,62 +76,85 @@ model Room {
   @@index([featured])
 }
 
-// ─── Booking ───
 model Booking {
-  id            String   @id @default(cuid())
-  bookingCode   String   @unique @default(cuid()) // human-friendly booking reference
-  roomId        String
-  room          Room     @relation(fields: [roomId], references: [id])
-  checkIn       DateTime
-  checkOut      DateTime
-  nights        Int
-  guests        Int
-  totalAmount   Int      // in INR
-  status        String   @default("PENDING") // PENDING, PAYMENT_PENDING, CONFIRMED, CANCELLED, COMPLETED
+  id                String        @id @default(cuid())
+  bookingCode       String        @unique @default(cuid())
+  roomId            String
+  room              Room          @relation(fields: [roomId], references: [id])
+  checkIn           DateTime
+  checkOut          DateTime
+  nights            Int
+  guests            Int
+  totalAmount       Int
+  status            BookingStatus @default(HOLD)
+  guestName         String
+  guestEmail        String
+  guestPhone        String
+  specialRequests   String?
+  expiresAt         DateTime?
+  accessTokenHash   String?       @unique
+  idempotencyKeyHash String?      @unique
+  requestFingerprint String?
+  payments          Payment[]
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 
-  // Guest details (no login required for customers)
-  guestName     String
-  guestEmail    String
-  guestPhone    String
-  specialRequests String?
-
-  payment   Payment?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([roomId])
-  @@index([status])
-  @@index([checkIn, checkOut])
+  @@index([roomId, status, checkIn, checkOut])
+  @@index([status, expiresAt])
   @@index([guestEmail])
 }
 
-// ─── Payment ───
 model Payment {
-  id                 String   @id @default(cuid())
-  bookingId          String   @unique
-  booking            Booking  @relation(fields: [bookingId], references: [id])
-  razorpayOrderId    String   @unique
-  razorpayPaymentId  String?
+  id                 String        @id @default(cuid())
+  bookingId          String
+  booking            Booking       @relation(fields: [bookingId], references: [id])
+  razorpayOrderId    String?       @unique
+  razorpayPaymentId  String?       @unique
   razorpaySignature  String?
-  amount             Int      // in paisa (INR * 100)
-  currency           String   @default("INR")
-  status             String   @default("CREATED") // CREATED, PENDING, PAID, FAILED, REFUNDED
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  amount             Int
+  currency           String        @default("INR")
+  status             PaymentStatus @default(CREATED)
+  failureReason      String?
+  providerMetadata   Json?
+  idempotencyKeyHash String?       @unique
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 
-  @@index([razorpayOrderId])
+  @@index([bookingId, status])
 }
 
-// ─── Enquiry (Contact Form) ───
 model Enquiry {
-  id        String   @id @default(cuid())
+  id        String        @id @default(cuid())
   name      String
   email     String
   phone     String?
   message   String
-  status    String   @default("UNREAD") // UNREAD, READ, REPLIED
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  status    EnquiryStatus @default(UNREAD)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 
   @@index([status])
+}
+
+model WebhookEvent {
+  id          String   @id @default(cuid())
+  eventId     String   @unique
+  eventType   String
+  payloadHash String
+  payload     Json?
+  status      String   @default("PENDING")
+  receivedAt  DateTime @default(now())
+  processedAt DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([status])
+}
+
+model RateLimitBucket {
+  key         String   @id
+  windowStart DateTime
+  expiresAt   DateTime
+  count       Int      @default(0)
+
+  @@index([expiresAt])
 }

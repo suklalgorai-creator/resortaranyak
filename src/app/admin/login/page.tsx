@@ -2,10 +2,29 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setLoading(true);
+    setError('');
+    const result = await signIn('credentials', { email, password, redirect: false, callbackUrl: '/admin/dashboard' });
+    if (!result || result.error) {
+      setError('Invalid email or password.');
+      setLoading(false);
+      return;
+    }
+    router.push('/admin/dashboard');
+    router.refresh();
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-[#111] px-4">
@@ -18,7 +37,8 @@ export default function AdminLoginPage() {
         </div>
 
         <div className="bg-white dark:bg-white/5 glass-card rounded-2xl border border-stone-200 dark:border-white/5 p-8 shadow-lg">
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {error && <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
             <div>
               <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">Email</label>
               <input
@@ -41,9 +61,10 @@ export default function AdminLoginPage() {
             </div>
             <button
               type="submit"
+              disabled={loading}
               className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-sm"
             >
-              Sign In
+              {loading ? 'Signing in…' : 'Sign In'}
             </button>
           </form>
         </div>

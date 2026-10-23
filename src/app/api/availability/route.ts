@@ -3,26 +3,29 @@ import { bookingService } from '@/services/booking.service';
 import { checkAvailabilitySchema } from '@/validations/booking.schema';
 import { AppError } from '@/lib/errors';
 import { z } from 'zod/v4';
+import { enforceRateLimit } from '@/lib/rate-limit';
+import { parseDateOnly } from '@/lib/security';
 
 export async function GET(req: NextRequest) {
+  const limited = await enforceRateLimit(req, 'availability', 30, 60);
+  if (limited) return limited;
+
   try {
     const searchParams = req.nextUrl.searchParams;
     const roomId = searchParams.get('roomId');
     const checkIn = searchParams.get('checkIn');
     const checkOut = searchParams.get('checkOut');
 
-    // Pass strings to Zod (schema expects strings)
     const validatedData = checkAvailabilitySchema.parse({
       roomId,
       checkIn,
       checkOut,
     });
 
-    // Convert to Date after validation
     const availability = await bookingService.checkAvailability(
       validatedData.roomId,
-      new Date(validatedData.checkIn),
-      new Date(validatedData.checkOut)
+      parseDateOnly(validatedData.checkIn),
+      parseDateOnly(validatedData.checkOut),
     );
 
     return NextResponse.json({ success: true, data: availability });
@@ -33,7 +36,7 @@ export async function GET(req: NextRequest) {
     if (error instanceof AppError) {
       return NextResponse.json({ success: false, error: error.message }, { status: error.statusCode });
     }
-    const message = error instanceof Error ? error.message : 'Internal server error';
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    console.error('Availability lookup failed', error);
+    return NextResponse.json({ success: false, error: 'Unable to check availability' }, { status: 500 });
   }
 }

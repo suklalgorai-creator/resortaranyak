@@ -15,7 +15,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
     if (error instanceof AppError) {
       return NextResponse.json({ success: false, error: error.message }, { status: error.statusCode });
     }
-    const message = error instanceof Error ? error.message : 'Internal server error';
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    console.error('Room lookup failed', error);
+    return NextResponse.json({ success: false, error: 'Unable to fetch room' }, { status: 500 });
   }
 }

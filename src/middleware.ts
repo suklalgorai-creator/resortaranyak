@@ -7,10 +7,18 @@ export default auth((req) => {
   const isAdminApiRoute = pathname.startsWith('/api/admin');
   const isLoginPage = pathname === '/admin/login';
   const isAuthenticated = !!req.auth;
+  const isAdmin = (req.auth?.user as { role?: string } | undefined)?.role === 'ADMIN';
 
   // Protect admin pages (redirect to login)
   if (isAdminRoute && !isLoginPage && !isAuthenticated) {
     return NextResponse.redirect(new URL('/admin/login', req.url));
+  }
+
+  if (isAdminRoute && !isLoginPage && isAuthenticated && !isAdmin) {
+    if (isAdminApiRoute) {
+      return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
+    }
+    return NextResponse.redirect(new URL('/admin/login?error=forbidden', req.url));
   }
 
   // Protect admin API routes (return 401 JSON)

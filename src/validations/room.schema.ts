@@ -1,12 +1,15 @@
 import { z } from 'zod/v4';
 
 export const createRoomSchema = z.object({
-  name: z.string().min(1, 'Room name is required'),
-  description: z.string().min(10, 'Description must be at least 10 characters'),
-  pricePerNight: z.number().positive('Price must be positive'),
+  name: z.string().trim().min(1).max(100),
+  description: z.string().trim().min(10).max(5000),
+  pricePerNight: z.number().int().positive().max(1_000_000),
   maxGuests: z.number().int().min(1).max(20),
-  roomSize: z.string().optional(),
-  bedType: z.string().min(1, 'Bed type is required'),
+  roomSize: z.string().trim().max(50).optional(),
+  bedType: z.string().trim().min(1).max(50),
+  inventoryCount: z.number().int().min(1).max(100).default(1),
+  images: z.array(z.string().max(500)).max(20).default([]),
+  amenities: z.array(z.string().trim().max(100)).max(50).default([]),
   status: z.enum(['AVAILABLE', 'MAINTENANCE', 'DEACTIVATED']).default('AVAILABLE'),
 });
 

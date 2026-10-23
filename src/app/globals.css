@@ -215,3 +215,29 @@ html {
   height: 80%;
   background: linear-gradient(to bottom, transparent, rgba(160, 196, 160, 0.15), rgba(212, 175, 55, 0.1), transparent);
 }
+
+/* ===== MOBILE SAFE AREA ===== */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ===== MOBILE STEP INDICATOR ===== */
+.step-indicator {
+  position: relative;
+}
+.step-indicator::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 100%;
+  height: 2px;
+  background: var(--border);
+  transform: translateY(-50%);
+}
+.step-indicator:last-child::after {
+  display: none;
+}
+.step-indicator.active::after {
+  background: var(--gold);
+}

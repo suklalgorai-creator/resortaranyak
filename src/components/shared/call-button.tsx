@@ -1,7 +1,9 @@
+'use client';
+
 export default function CallButton() {
   return (
     <a
-      href="tel:+91XXXXXXXXXX"
+      href="tel:+917362888864"
       className="fixed bottom-24 md:bottom-28 right-4 md:right-6 z-50 flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-green-700 text-white rounded-full shadow-lg hover:bg-green-800 hover:scale-110 transition-all duration-300 group"
       aria-label="Call us"
     >

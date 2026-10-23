@@ -8,10 +8,30 @@ import { Card } from '@/components/ui/card';
 import { Input, Textarea } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 export default function ContactPage() {
-  const handleSend = () => {
-    toast.success('Message sent! We will get back to you soon.');
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSend = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitting(true);
+    try {
+      const response = await fetch('/api/enquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const result = await response.json() as { success: boolean; error?: string };
+      if (!response.ok || !result.success) throw new Error(result.error || 'Unable to send message');
+      setForm({ name: '', email: '', phone: '', message: '' });
+      toast.success('Message sent! We will get back to you soon.');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Unable to send message');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -95,13 +115,16 @@ export default function ContactPage() {
           >
             <Card className="p-8 glass-card">
               <h3 className="text-2xl font-serif text-heading mb-6">Send us a Message</h3>
-              <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+              <form className="space-y-4" onSubmit={handleSend}>
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-heading mb-1">Name</label>
                   <Input 
                     type="text" 
                     id="name" 
                     placeholder="Your Name"
+                    maxLength={100}
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
                     className="glass-input"
                   />
                 </div>
@@ -109,10 +132,13 @@ export default function ContactPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-heading mb-1">Email</label>
-                    <Input 
+                    <Input
                       type="email" 
                       id="email" 
                       placeholder="your@email.com"
+                      maxLength={254}
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
                       className="glass-input"
                     />
                   </div>
@@ -120,8 +146,11 @@ export default function ContactPage() {
                     <label htmlFor="phone" className="block text-sm font-medium text-heading mb-1">Phone</label>
                     <Input 
                       type="tel" 
-                      id="phone" 
-                      placeholder="Your Phone Number"
+                    id="phone"
+                    placeholder="Your Phone Number"
+                    maxLength={30}
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
                       className="glass-input"
                     />
                   </div>
@@ -133,15 +162,18 @@ export default function ContactPage() {
                     id="message" 
                     rows={4}
                     placeholder="How can we help you?"
+                    maxLength={3000}
+                    value={form.message}
+                    onChange={(e) => setForm({ ...form, message: e.target.value })}
                     className="glass-input resize-none"
                   />
                 </div>
 
                 <Button 
-                  type="button"
+                  type="submit"
                   variant="primary"
                   className="w-full"
-                  onClick={handleSend}
+                  isLoading={submitting}
                 >
                   <Send className="w-4 h-4 mr-2" />
                   Send Message

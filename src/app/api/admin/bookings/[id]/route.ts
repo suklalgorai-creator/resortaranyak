@@ -4,15 +4,21 @@ import { bookingService } from '@/services/booking.service';
 import { BOOKING_STATUS } from '@/lib/constants';
 import { AppError } from '@/lib/errors';
 import { z } from 'zod/v4';
+import { hasAdminRole } from '@/lib/authz';
 
-const validStatuses = Object.values(BOOKING_STATUS);
 const updateStatusSchema = z.object({
-  status: z.enum(validStatuses as [string, ...string[]]),
+  status: z.enum([
+    BOOKING_STATUS.CANCELLED,
+    BOOKING_STATUS.CANCEL_REQUESTED,
+    BOOKING_STATUS.EXPIRED,
+    BOOKING_STATUS.FAILED,
+    BOOKING_STATUS.COMPLETED,
+  ]),
 });
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
-  if (!session || (session.user as { role?: string })?.role !== 'ADMIN') {
+  if (!session || !(await hasAdminRole(session.user?.id))) {
     return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
   }
 
@@ -30,7 +36,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
-  if (!session || (session.user as { role?: string })?.role !== 'ADMIN') {
+  if (!session || !(await hasAdminRole(session.user?.id))) {
     return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
   }
 

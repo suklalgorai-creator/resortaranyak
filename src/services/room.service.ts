@@ -15,10 +15,16 @@ async function getAll() {
 }
 
 async function getBySlug(slug: string) {
-  const room = await prisma.room.findUnique({ where: { slug } });
+  const room = await prisma.room.findFirst({ where: { slug, status: { not: ROOM_STATUS.DEACTIVATED } } });
   if (!room) {
     throw new NotFoundError('Room not found');
   }
+  return room;
+}
+
+async function getById(id: string) {
+  const room = await prisma.room.findUnique({ where: { id } });
+  if (!room) throw new NotFoundError('Room not found');
   return room;
 }
 
@@ -46,4 +52,4 @@ async function deactivate(id: string) {
   });
 }
 
-export const roomService = { getAll, getBySlug, create, update, deactivate };
+export const roomService = { getAll, getBySlug, getById, create, update, deactivate };

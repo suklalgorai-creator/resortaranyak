@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, RoomStatus } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -7,18 +7,27 @@ async function main() {
   console.log('🌱 Seeding database...');
 
   // ─── Create Admin User ───
-  const hashedPassword = await bcrypt.hash('admin123', 12);
-  const admin = await prisma.user.upsert({
-    where: { email: 'smnt.mukherjee@gmail.com' },
-    update: {},
-    create: {
-      name: 'Admin',
-      email: 'smnt.mukherjee@gmail.com',
-      password: hashedPassword,
-      role: 'ADMIN',
-    },
-  });
-  console.log(`✅ Admin user: ${admin.email}`);
+  const adminEmail = process.env.INITIAL_ADMIN_EMAIL?.trim().toLowerCase();
+  const adminPassword = process.env.INITIAL_ADMIN_PASSWORD;
+
+  if (!adminEmail || !adminPassword) {
+    console.log('ℹ️  Skipping admin seed. Set INITIAL_ADMIN_EMAIL and INITIAL_ADMIN_PASSWORD for a secure bootstrap.');
+  } else if (adminPassword.length < 12) {
+    throw new Error('INITIAL_ADMIN_PASSWORD must be at least 12 characters');
+  } else {
+    const hashedPassword = await bcrypt.hash(adminPassword, 12);
+    const admin = await prisma.user.upsert({
+      where: { email: adminEmail },
+      update: {},
+      create: {
+        name: 'Admin',
+        email: adminEmail,
+        password: hashedPassword,
+        role: 'ADMIN',
+      },
+    });
+    console.log(`✅ Admin user bootstrapped: ${admin.email}`);
+  }
 
   // ─── Create Rooms ───
   const rooms = [
@@ -34,7 +43,7 @@ async function main() {
       inventoryCount: 5,
       images: ['/room-1.jpg'],
       amenities: ['Air Conditioning', 'Free WiFi', 'Room Service', 'Hot Water', 'TV', 'Balcony'],
-      status: 'AVAILABLE',
+      status: RoomStatus.AVAILABLE,
       featured: true,
     },
     {
@@ -49,7 +58,7 @@ async function main() {
       inventoryCount: 8,
       images: ['/room-2.jpg'],
       amenities: ['Fan', 'Charging Points', 'Bedding', 'Lamp', 'Outdoor Seating'],
-      status: 'AVAILABLE',
+      status: RoomStatus.AVAILABLE,
       featured: true,
     },
     {
@@ -64,7 +73,7 @@ async function main() {
       inventoryCount: 3,
       images: ['/gallery-1.jpg'],
       amenities: ['Air Conditioning', 'Free WiFi', 'Room Service', 'Hot Water', 'TV', 'Garden Access', 'Private Sit-out'],
-      status: 'AVAILABLE',
+      status: RoomStatus.AVAILABLE,
       featured: true,
     },
   ];

@@ -1,170 +1,257 @@
 import Razorpay from 'razorpay';
-import { prisma } from '@/lib/db';
-import { PAYMENT_STATUS, BOOKING_STATUS } from '@/lib/constants';
 import crypto from 'crypto';
-import { AppError } from '@/lib/errors';
+import { Prisma } from '@prisma/client';
+import { prisma } from '@/lib/db';
+import { BOOKING_STATUS, PAYMENT_STATUS } from '@/lib/constants';
+import { AppError, ConflictError, NotFoundError } from '@/lib/errors';
+import { hashOpaqueToken, safeCompareHex } from '@/lib/security';
 
-// Lazy initialization to avoid build-time crash
-let _razorpay: InstanceType<typeof Razorpay> | null = null;
-function getRazorpay() {
-  if (!_razorpay) {
-    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-      throw new AppError('Razorpay credentials are not set', 500);
+let razorpayClient: InstanceType<typeof Razorpay> | null = null;
+
+async function serializable<T>(callback: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      return await prisma.$transaction(callback, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2034' && attempt < 2) continue;
+      throw error;
     }
-    _razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID,
-      key_secret: process.env.RAZORPAY_KEY_SECRET,
-    });
   }
-  return _razorpay;
+  throw new ConflictError('Payment operation conflicted with another request');
 }
 
-const createOrder = async (bookingId: string) => {
-  const booking = await prisma.booking.findUnique({
-    where: { id: bookingId }
-  });
-  
-  if (!booking) {
-    throw new AppError('Booking not found', 404);
+function getRazorpay(): InstanceType<typeof Razorpay> {
+  if (!razorpayClient) {
+    const keyId = process.env.RAZORPAY_KEY_ID;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    if (!keyId || !keySecret) throw new AppError('Payment service is not configured', 503);
+    razorpayClient = new Razorpay({ key_id: keyId, key_secret: keySecret });
   }
+  return razorpayClient;
+}
 
-  const amountInPaisa = Math.round(booking.totalAmount * 100);
+function assertSignature(expected: string, actual: string) {
+  if (!safeCompareHex(expected, actual)) throw new AppError('Invalid payment signature', 400);
+}
 
-  const razorpay = getRazorpay();
-  const order = await razorpay.orders.create({
-    amount: amountInPaisa,
-    currency: 'INR',
-    receipt: bookingId,
-  });
+function isExpired(expiresAt: Date | null): boolean {
+  return !expiresAt || expiresAt.getTime() <= Date.now();
+}
 
-  // Use upsert to handle payment retry (prevents unique constraint crash)
-  await prisma.payment.upsert({
-    where: { bookingId },
-    create: {
-      bookingId,
-      razorpayOrderId: order.id,
-      amount: amountInPaisa, // Store in paisa (matches schema comment)
-      status: PAYMENT_STATUS.CREATED,
-    },
-    update: {
-      razorpayOrderId: order.id,
-      amount: amountInPaisa,
-      status: PAYMENT_STATUS.CREATED,
+async function createOrder(checkoutToken: string) {
+  const tokenHash = hashOpaqueToken(checkoutToken);
+  return serializable(async (tx) => {
+    const booking = await tx.booking.findUnique({
+      where: { accessTokenHash: tokenHash },
+      include: { payments: true, room: true },
+    });
+    if (!booking) throw new NotFoundError('Checkout session not found');
+    if (booking.status === BOOKING_STATUS.CONFIRMED) throw new ConflictError('Booking is already confirmed');
+    if (booking.status === BOOKING_STATUS.CANCELLED || booking.status === BOOKING_STATUS.EXPIRED) {
+      throw new ConflictError('Booking is no longer payable');
     }
+    if (isExpired(booking.expiresAt)) {
+      await tx.booking.update({ where: { id: booking.id }, data: { status: BOOKING_STATUS.EXPIRED } });
+      throw new ConflictError('Checkout session has expired');
+    }
+
+    const existingAttempt = booking.payments.find((payment) =>
+      [PAYMENT_STATUS.CREATED, PAYMENT_STATUS.AUTHORIZED].includes(payment.status as never) && payment.razorpayOrderId,
+    );
+    if (existingAttempt?.razorpayOrderId) {
+      return {
+        id: existingAttempt.razorpayOrderId,
+        amount: existingAttempt.amount,
+        currency: existingAttempt.currency,
+      };
+    }
+
+    const amount = booking.totalAmount * 100;
+    if (!Number.isSafeInteger(amount) || amount <= 0) throw new AppError('Invalid booking amount', 500);
+
+    const order = await getRazorpay().orders.create({
+      amount,
+      currency: 'INR',
+      receipt: booking.bookingCode,
+      notes: { bookingId: booking.id },
+    });
+
+    await tx.payment.create({
+      data: {
+        bookingId: booking.id,
+        razorpayOrderId: order.id,
+        amount,
+        currency: 'INR',
+        status: PAYMENT_STATUS.CREATED,
+      },
+    });
+    await tx.booking.update({
+      where: { id: booking.id },
+      data: { status: BOOKING_STATUS.PAYMENT_PENDING },
+    });
+
+    return order;
   });
+}
 
-  await prisma.booking.update({
-    where: { id: bookingId },
-    data: { status: BOOKING_STATUS.PAYMENT_PENDING }
-  });
-
-  return order;
-};
-
-const verifyPayment = async ({ razorpay_order_id, razorpay_payment_id, razorpay_signature, bookingId }: {
+async function verifyPayment({
+  razorpay_order_id,
+  razorpay_payment_id,
+  razorpay_signature,
+  checkoutToken,
+}: {
   razorpay_order_id: string;
   razorpay_payment_id: string;
   razorpay_signature: string;
-  bookingId: string;
-}) => {
+  checkoutToken: string;
+}) {
   const secret = process.env.RAZORPAY_KEY_SECRET;
-  if (!secret) {
-    throw new AppError('Razorpay secret not configured', 500);
-  }
-
-  // Verify HMAC signature
-  const body = razorpay_order_id + "|" + razorpay_payment_id;
-  const expectedSignature = crypto.createHmac('sha256', secret).update(body).digest('hex');
-
-  // Use timing-safe comparison to prevent timing attacks
-  const isValid = crypto.timingSafeEqual(
-    Buffer.from(expectedSignature, 'hex'),
-    Buffer.from(razorpay_signature, 'hex')
-  );
-
-  if (!isValid) {
-    throw new AppError('Invalid payment signature', 400);
-  }
-
-  // Verify that the order actually belongs to this booking (prevents IDOR)
-  const payment = await prisma.payment.findFirst({
-    where: { razorpayOrderId: razorpay_order_id }
-  });
-
-  if (!payment) {
-    throw new AppError('Payment record not found for this order', 404);
-  }
-
-  if (payment.bookingId !== bookingId) {
-    throw new AppError('Payment does not belong to this booking', 403);
-  }
-
-  if (payment.status === PAYMENT_STATUS.PAID) {
-    return { verified: true, message: 'Payment already verified' };
-  }
-
-  // Update payment and booking status
-  await prisma.payment.update({
-    where: { id: payment.id },
-    data: {
-      razorpayPaymentId: razorpay_payment_id,
-      razorpaySignature: razorpay_signature,
-      status: PAYMENT_STATUS.PAID,
-    }
-  });
-
-  await prisma.booking.update({
-    where: { id: bookingId },
-    data: { status: BOOKING_STATUS.CONFIRMED }
-  });
-
-  return { verified: true };
-};
-
-const handleWebhook = async (body: string, signature: string) => {
-  const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
-  if (!secret) {
-    throw new AppError('Webhook secret not configured', 500);
-  }
-
-  // Use correct Razorpay SDK method for webhook validation
+  if (!secret) throw new AppError('Payment service is not configured', 503);
   const expectedSignature = crypto
     .createHmac('sha256', secret)
-    .update(body)
+    .update(`${razorpay_order_id}|${razorpay_payment_id}`)
     .digest('hex');
+  assertSignature(expectedSignature, razorpay_signature);
 
-  const isValid = crypto.timingSafeEqual(
-    Buffer.from(expectedSignature, 'hex'),
-    Buffer.from(signature, 'hex')
-  );
+  const booking = await prisma.booking.findUnique({
+    where: { accessTokenHash: hashOpaqueToken(checkoutToken) },
+    include: { payments: true },
+  });
+  if (!booking) throw new NotFoundError('Checkout session not found');
 
-  if (!isValid) {
-    throw new AppError('Invalid webhook signature', 400);
+  const attempt = booking.payments.find((payment) => payment.razorpayOrderId === razorpay_order_id);
+  if (!attempt) throw new AppError('Payment attempt not found', 404);
+  if (attempt.status === PAYMENT_STATUS.CAPTURED) return { verified: true, bookingCode: booking.bookingCode };
+  if (booking.status === BOOKING_STATUS.CANCELLED || booking.status === BOOKING_STATUS.EXPIRED || isExpired(booking.expiresAt)) {
+    throw new ConflictError('Booking is no longer payable');
   }
 
-  const event = JSON.parse(body);
+  let providerOrder: { id: string; amount: string | number; currency: string };
+  let providerPayment: { id: string; order_id: string; amount: string | number; currency: string; status: string };
+  try {
+    providerOrder = await getRazorpay().orders.fetch(razorpay_order_id);
+    providerPayment = await getRazorpay().payments.fetch(razorpay_payment_id);
+  } catch {
+    throw new AppError('Unable to verify payment with payment provider', 502);
+  }
 
-  if (event.event === 'payment.captured') {
-    const paymentEntity = event.payload.payment.entity;
-    const orderId = paymentEntity.order_id;
-    
-    const payment = await prisma.payment.findFirst({
-      where: { razorpayOrderId: orderId }
+  if (
+    providerOrder.id !== attempt.razorpayOrderId ||
+    Number(providerOrder.amount) !== attempt.amount ||
+    providerOrder.currency !== attempt.currency ||
+    providerPayment.order_id !== attempt.razorpayOrderId ||
+    Number(providerPayment.amount) !== attempt.amount ||
+    providerPayment.currency !== attempt.currency ||
+    providerPayment.status !== 'captured'
+  ) {
+    throw new AppError('Payment details do not match the booking', 400);
+  }
+
+  await serializable(async (tx) => {
+    await tx.$queryRaw(Prisma.sql`SELECT "id" FROM "Booking" WHERE "id" = ${booking.id} FOR UPDATE`);
+    const lockedBooking = await tx.booking.findUnique({ where: { id: booking.id } });
+    const lockedAttempt = await tx.payment.findUnique({ where: { id: attempt.id } });
+    if (!lockedBooking || !lockedAttempt) throw new NotFoundError('Payment attempt not found');
+    if (lockedAttempt.status === PAYMENT_STATUS.CAPTURED) return;
+    if (lockedBooking.status === BOOKING_STATUS.CANCELLED || lockedBooking.status === BOOKING_STATUS.EXPIRED || isExpired(lockedBooking.expiresAt)) {
+      throw new ConflictError('Booking is no longer payable');
+    }
+
+    await tx.payment.update({
+      where: { id: lockedAttempt.id },
+      data: {
+        razorpayPaymentId: razorpay_payment_id,
+        razorpaySignature: razorpay_signature,
+        status: PAYMENT_STATUS.CAPTURED,
+        providerMetadata: providerPayment as unknown as Prisma.InputJsonValue,
+      },
+    });
+    await tx.booking.update({
+      where: { id: lockedBooking.id },
+      data: { status: BOOKING_STATUS.CONFIRMED, expiresAt: null },
+    });
+  });
+
+  return { verified: true, bookingCode: booking.bookingCode };
+}
+
+async function handleWebhook(body: string, signature: string, eventId: string) {
+  const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+  if (!secret) throw new AppError('Webhook service is not configured', 503);
+  const expectedSignature = crypto.createHmac('sha256', secret).update(body).digest('hex');
+  assertSignature(expectedSignature, signature);
+
+  let event: {
+    event?: string;
+    payload?: { payment?: { entity?: Record<string, unknown> } };
+  };
+  try {
+    event = JSON.parse(body) as typeof event;
+  } catch {
+    throw new AppError('Invalid webhook payload', 400);
+  }
+  if (!event.event || !event.payload?.payment?.entity) throw new AppError('Unsupported webhook payload', 400);
+
+  const payloadHash = crypto.createHash('sha256').update(body).digest('hex');
+  try {
+    await prisma.webhookEvent.create({
+      data: {
+        eventId,
+        eventType: event.event,
+        payloadHash,
+        payload: event as unknown as Prisma.InputJsonValue,
+      },
+    });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return { success: true, duplicate: true };
+    }
+    throw error;
+  }
+
+  try {
+    const entity = event.payload.payment.entity;
+    const orderId = typeof entity.order_id === 'string' ? entity.order_id : null;
+    const paymentId = typeof entity.id === 'string' ? entity.id : null;
+    const amount = typeof entity.amount === 'number' ? entity.amount : null;
+    const currency = typeof entity.currency === 'string' ? entity.currency : null;
+    if (!orderId || !paymentId || amount === null || !currency) throw new AppError('Invalid payment event', 400);
+
+    await serializable(async (tx) => {
+      const attempt = await tx.payment.findUnique({ where: { razorpayOrderId: orderId } });
+      if (!attempt) throw new NotFoundError('Payment attempt not found');
+      if (attempt.amount !== amount || attempt.currency !== currency) throw new ConflictError('Payment amount mismatch');
+
+      const booking = await tx.booking.findUnique({ where: { id: attempt.bookingId } });
+      if (!booking) throw new NotFoundError('Booking not found');
+      if (attempt.status === PAYMENT_STATUS.CAPTURED) return;
+
+      if (event.event === 'payment.captured') {
+        await tx.payment.update({
+          where: { id: attempt.id },
+          data: { razorpayPaymentId: paymentId, status: PAYMENT_STATUS.CAPTURED, providerMetadata: entity as Prisma.InputJsonValue },
+        });
+        if (booking.status === BOOKING_STATUS.HOLD || booking.status === BOOKING_STATUS.PAYMENT_PENDING) {
+          if (booking.expiresAt && booking.expiresAt.getTime() > Date.now()) {
+            await tx.booking.update({ where: { id: booking.id }, data: { status: BOOKING_STATUS.CONFIRMED, expiresAt: null } });
+          } else {
+            await tx.booking.update({ where: { id: booking.id }, data: { status: BOOKING_STATUS.EXPIRED } });
+          }
+        }
+      } else if (event.event === 'payment.failed') {
+        await tx.payment.update({ where: { id: attempt.id }, data: { status: PAYMENT_STATUS.FAILED, failureReason: 'Razorpay payment failed', providerMetadata: entity as Prisma.InputJsonValue } });
+        if (booking.status === BOOKING_STATUS.PAYMENT_PENDING) {
+          await tx.booking.update({ where: { id: booking.id }, data: { status: BOOKING_STATUS.FAILED } });
+        }
+      }
     });
 
-    if (payment && payment.status !== PAYMENT_STATUS.PAID) {
-      await prisma.payment.update({
-        where: { id: payment.id },
-        data: { status: PAYMENT_STATUS.PAID }
-      });
-      await prisma.booking.update({
-        where: { id: payment.bookingId },
-        data: { status: BOOKING_STATUS.CONFIRMED }
-      });
-    }
+    await prisma.webhookEvent.update({ where: { eventId }, data: { status: 'PROCESSED', processedAt: new Date() } });
+    return { success: true, duplicate: false };
+  } catch (error) {
+    await prisma.webhookEvent.update({ where: { eventId }, data: { status: 'FAILED' } }).catch(() => undefined);
+    throw error;
   }
-
-  return { success: true };
-};
+}
 
 export const paymentService = { createOrder, verifyPayment, handleWebhook };
