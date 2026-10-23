@@ -30,7 +30,7 @@ export default function Header() {
       >
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <span className="font-playfair text-2xl font-bold text-forest dark:text-stone-200 tracking-tight">
+            <span className="font-playfair text-2xl font-bold text-[#164e38] dark:text-stone-100 tracking-tight">
               Resort Arranyak
             </span>
           </Link>
@@ -40,7 +40,7 @@ export default function Header() {
               <Link 
                 key={link.label} 
                 href={link.href}
-                className="text-stone-600 dark:text-stone-300 hover:text-gold dark:hover:text-gold font-medium transition-colors text-sm uppercase tracking-wider"
+                className="text-stone-700 dark:text-stone-300 hover:text-gold dark:hover:text-gold font-medium transition-colors text-sm uppercase tracking-wider"
               >
                 {link.label}
               </Link>

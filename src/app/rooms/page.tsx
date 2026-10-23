@@ -18,6 +18,7 @@ export default function RoomsPage() {
           <SectionHeader 
             title="Our Rooms & Suites" 
             subtitle="Experience the perfect blend of comfort and nature in our carefully designed accommodations."
+            tone="light"
           />
         </div>
       </section>

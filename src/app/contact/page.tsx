@@ -46,6 +46,7 @@ export default function ContactPage() {
           <SectionHeader 
             title="Contact Us" 
             subtitle="We'd love to hear from you"
+            tone="light"
           />
         </motion.div>
       </section>

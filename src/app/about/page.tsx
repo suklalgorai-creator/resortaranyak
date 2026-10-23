@@ -20,7 +20,7 @@ export default function AboutPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-stone-200 max-w-2xl mx-auto text-lg md:text-xl font-light"
+          className="text-white/90 max-w-2xl mx-auto text-lg md:text-xl font-light"
         >
           A premium nature resort near Ghatsila, Jharkhand
         </motion.p>
@@ -37,7 +37,7 @@ export default function AboutPage() {
             className="space-y-6"
           >
             <h2 className="text-3xl md:text-5xl font-serif text-forest dark:text-gold-light mb-6">Our Story</h2>
-            <div className="space-y-4 text-lg text-stone-700 dark:text-stone-300 leading-relaxed font-light">
+            <div className="space-y-4 text-lg text-stone-800 dark:text-stone-300 leading-relaxed font-light">
               <p>
                 Nestled in the pristine landscape of Ghatsila, Resort Arranyak was born out of a deep connection to nature. We believe in providing an oasis where guests can disconnect from the bustling city life and reconnect with the tranquil rhythms of the forest.
               </p>
@@ -80,7 +80,7 @@ export default function AboutPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-stone-600 dark:text-stone-400 max-w-2xl mx-auto text-lg"
+            className="text-stone-700 dark:text-stone-300 max-w-2xl mx-auto text-lg"
           >
             Experience the perfect blend of natural beauty, modern comfort, and culinary excellence.
           </motion.p>
@@ -104,7 +104,7 @@ export default function AboutPage() {
                 {feature.icon}
               </div>
               <h3 className="text-2xl font-serif mb-4 text-forest dark:text-gold-light">{feature.title}</h3>
-              <p className="text-stone-600 dark:text-stone-400 leading-relaxed font-light">
+              <p className="text-stone-700 dark:text-stone-300 leading-relaxed font-light">
                 {feature.desc}
               </p>
             </motion.div>

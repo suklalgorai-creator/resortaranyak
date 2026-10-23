@@ -46,7 +46,7 @@ export default function AmenitiesPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-stone-200 max-w-2xl mx-auto text-lg md:text-xl font-light"
+          className="text-white/90 max-w-2xl mx-auto text-lg md:text-xl font-light"
         >
           Everything you need for a perfect, relaxing getaway
         </motion.p>

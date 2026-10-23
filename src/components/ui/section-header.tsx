@@ -10,6 +10,7 @@ interface SectionHeaderProps {
   divider?: boolean;
   className?: string;
   animate?: boolean;
+  tone?: 'default' | 'light';
 }
 
 export function SectionHeader({
@@ -19,6 +20,7 @@ export function SectionHeader({
   divider = true,
   className,
   animate = true,
+  tone = 'default',
 }: SectionHeaderProps) {
   const Wrapper = animate ? motion.div : 'div';
   const animationProps = animate
@@ -40,7 +42,10 @@ export function SectionHeader({
         className
       )}
     >
-      <h2 className="font-serif text-3xl md:text-5xl text-heading mb-4 font-semibold tracking-wide">
+      <h2 className={cn(
+        'font-serif text-3xl md:text-5xl mb-4 font-semibold tracking-wide',
+        tone === 'light' ? 'text-white' : 'text-heading'
+      )}>
         {title}
       </h2>
       {divider && (
@@ -54,9 +59,10 @@ export function SectionHeader({
         />
       )}
       {subtitle && (
-        <p
+          <p
           className={cn(
-            'text-bodytext max-w-2xl text-lg',
+            'max-w-2xl text-lg',
+            tone === 'light' ? 'text-white/90' : 'text-bodytext',
             align === 'center' && 'mx-auto'
           )}
         >
