@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Keep Tailwind dark utilities in sync with next-themes' class strategy. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-border: var(--border);
   --color-input: var(--border);
