@@ -125,15 +125,15 @@ export default function BookPage() {
   }
 
   return (
-    <section className="min-h-screen pt-24 pb-16 px-4">
+    <section className="min-h-screen pt-24 pb-24 sm:pb-16 px-4">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" />
       <div className="max-w-4xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="font-serif text-4xl md:text-5xl text-forest dark:text-stone-100 font-bold text-center mb-2">Book Your Stay</h1>
-          <p className="text-center text-stone-500 dark:text-stone-400 mb-10">Reserve your perfect getaway at Resort Arranyak</p>
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl text-forest dark:text-stone-100 font-bold text-center mb-2">Book Your Stay</h1>
+          <p className="text-center text-sm sm:text-base text-stone-500 dark:text-stone-400 mb-8 sm:mb-10">Reserve your perfect getaway at Resort Arranyak</p>
         </motion.div>
 
-        <form onSubmit={handleSubmit} className="bg-white dark:bg-white/5 glass-card rounded-2xl border border-stone-200 dark:border-white/5 p-6 md:p-10 shadow-xl space-y-8">
+        <form onSubmit={handleSubmit} className="bg-white dark:bg-white/5 glass-card rounded-2xl border border-stone-200 dark:border-white/5 p-4 sm:p-6 md:p-10 shadow-xl space-y-6 sm:space-y-8">
           {error && <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-red-700">{error}</p>}
           <div>
             <label className="flex items-center gap-2 text-sm font-semibold text-stone-700 dark:text-stone-300 mb-3"><BedDouble className="w-4 h-4" /> Select Room Type</label>
@@ -163,7 +163,7 @@ export default function BookPage() {
           </div>
           <label className="block text-sm font-semibold text-stone-700 dark:text-stone-300">Special requests<textarea maxLength={1000} value={specialRequests} onChange={(event) => { setSpecialRequests(event.target.value); resetRequest(); }} className="mt-2 w-full px-4 py-3 rounded-lg border border-stone-300 bg-transparent" rows={3} /></label>
 
-          {selected && nights > 0 && <div className="bg-stone-50 dark:bg-white/5 rounded-xl p-6 border border-stone-200"><div className="flex justify-between"><span>{nights} night{nights > 1 ? 's' : ''}</span><strong>₹{total.toLocaleString()}</strong></div></div>}
+          {selected && nights > 0 && <div className="bg-stone-50 dark:bg-white/5 rounded-xl p-4 sm:p-6 border border-stone-200"><div className="flex justify-between gap-4"><span>{nights} night{nights > 1 ? 's' : ''}</span><strong>₹{total.toLocaleString()}</strong></div></div>}
           <button type="submit" disabled={submitting || !canSubmit} className="w-full py-4 bg-gold hover:bg-gold-light disabled:opacity-50 text-stone-900 font-bold text-lg rounded-lg">{submitting ? 'Preparing secure checkout…' : 'Continue to secure payment'}</button>
         </form>
       </div>

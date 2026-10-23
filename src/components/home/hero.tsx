@@ -32,7 +32,7 @@ export default function Hero() {
   }, [goToNext]);
 
   return (
-    <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-black">
+    <section className="relative min-h-[640px] h-[100svh] max-h-[900px] w-full flex items-center justify-center overflow-hidden bg-black">
       {/* All images stacked — active one fades in with zoom */}
       {heroImages.map((src, i) => (
         <img
@@ -58,10 +58,10 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: 'easeOut' }}
         >
-          <span className="block text-gold-light uppercase tracking-[0.3em] text-sm md:text-base font-semibold mb-4 drop-shadow-md">
+          <span className="block text-gold-light uppercase tracking-[0.2em] sm:tracking-[0.3em] text-xs sm:text-sm md:text-base font-semibold mb-3 sm:mb-4 drop-shadow-md">
             Escape to Nature
           </span>
-          <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl text-white font-bold leading-tight mb-6 drop-shadow-2xl">
+          <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl text-white font-bold leading-tight mb-4 sm:mb-6 drop-shadow-2xl">
             {siteConfig.name}
           </h1>
         </motion.div>
@@ -70,7 +70,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
-          className="text-lg md:text-2xl text-stone-200/90 mb-10 max-w-3xl drop-shadow-lg font-light"
+          className="text-base sm:text-lg md:text-2xl text-stone-200/90 mb-7 sm:mb-10 max-w-3xl drop-shadow-lg font-light leading-relaxed"
         >
           {siteConfig.description}
         </motion.p>
@@ -79,17 +79,17 @@ export default function Hero() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.6, ease: 'easeOut' }}
-          className="flex flex-col sm:flex-row gap-4 sm:gap-6 w-full sm:w-auto px-4 sm:px-0"
+          className="flex flex-col sm:flex-row gap-3 sm:gap-6 w-full sm:w-auto px-4 sm:px-0"
         >
           <Link
             href="/book"
-            className="px-8 py-4 bg-gold hover:bg-gold-light text-stone-900 text-base sm:text-lg font-bold rounded-sm transition-all duration-300 text-center shadow-[0_0_20px_rgba(212,175,55,0.4)] hover:shadow-[0_0_30px_rgba(212,175,55,0.6)] hover:-translate-y-1 whitespace-nowrap"
+            className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-gold hover:bg-gold-light text-stone-900 text-base sm:text-lg font-bold rounded-sm transition-all duration-300 text-center shadow-[0_0_20px_rgba(212,175,55,0.4)] hover:shadow-[0_0_30px_rgba(212,175,55,0.6)] hover:-translate-y-1 whitespace-nowrap"
           >
             Book Your Stay
           </Link>
           <Link
             href="/rooms"
-            className="px-8 py-4 bg-transparent border-2 border-white/80 text-white hover:bg-white hover:text-stone-900 text-base sm:text-lg font-bold rounded-sm transition-all duration-300 text-center hover:-translate-y-1 whitespace-nowrap backdrop-blur-sm"
+            className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 bg-transparent border-2 border-white/80 text-white hover:bg-white hover:text-stone-900 text-base sm:text-lg font-bold rounded-sm transition-all duration-300 text-center hover:-translate-y-1 whitespace-nowrap backdrop-blur-sm"
           >
             Explore Rooms
           </Link>
@@ -97,7 +97,7 @@ export default function Hero() {
       </div>
 
       {/* Slide Indicators */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+      <div className="absolute bottom-24 sm:bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
         {heroImages.map((_, i) => (
           <button
             key={i}

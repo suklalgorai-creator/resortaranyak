@@ -37,7 +37,7 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Header */}
-      <section className="bg-forest text-white py-20 px-4 text-center">
+      <section className="bg-forest text-white py-16 sm:py-20 px-4 text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -50,8 +50,8 @@ export default function ContactPage() {
         </motion.div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 py-16">
-        <div className="grid md:grid-cols-2 gap-12 mb-16">
+      <div className="max-w-7xl mx-auto px-4 py-12 sm:py-16">
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12 mb-12 md:mb-16">
           {/* Contact Info */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -113,8 +113,8 @@ export default function ContactPage() {
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
           >
-            <Card className="p-8 glass-card">
-              <h3 className="text-2xl font-serif text-heading mb-6">Send us a Message</h3>
+            <Card className="p-5 sm:p-8 glass-card">
+              <h3 className="text-xl sm:text-2xl font-serif text-heading mb-6">Send us a Message</h3>
               <form className="space-y-4" onSubmit={handleSend}>
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-heading mb-1">Name</label>
@@ -129,7 +129,7 @@ export default function ContactPage() {
                   />
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-heading mb-1">Email</label>
                     <Input
@@ -189,7 +189,7 @@ export default function ContactPage() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
-          className="w-full h-[400px] rounded-2xl overflow-hidden glass-card p-1"
+          className="w-full h-[300px] sm:h-[400px] rounded-2xl overflow-hidden glass-card p-1"
         >
           <iframe 
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d117565.48512101683!2d86.3762818972656!3d22.581005900000008!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a164b3ef86f2b7f%3A0xc39955ed2e3bf4a9!2sAranyak%20Resort!5e0!3m2!1sen!2sin!4v1709405073123!5m2!1sen!2sin" 

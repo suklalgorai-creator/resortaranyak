@@ -17,7 +17,7 @@ export default function MobileBottomBar() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/90 dark:bg-[#1a1a1a]/90 backdrop-blur-xl border-t border-stone-200/50 dark:border-white/10 safe-area-bottom">
-      <div className="flex items-center justify-around px-2 py-1.5">
+      <div className="flex items-center justify-around px-1 py-1.5 sm:px-2">
         {mobileNavItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
@@ -27,7 +27,7 @@ export default function MobileBottomBar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-3 rounded-xl transition-all duration-200 min-w-[56px] ${
+              className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-1.5 sm:px-3 rounded-xl transition-all duration-200 min-w-[52px] sm:min-w-[56px] ${
                 isHighlight
                   ? 'relative -mt-5'
                   : ''
@@ -35,7 +35,7 @@ export default function MobileBottomBar() {
             >
               {isHighlight ? (
                 <div className="flex flex-col items-center">
-                  <div className="w-14 h-14 rounded-full bg-gold shadow-[0_0_20px_rgba(212,175,55,0.4)] flex items-center justify-center mb-0.5">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gold shadow-[0_0_20px_rgba(212,175,55,0.4)] flex items-center justify-center mb-0.5">
                     <Icon className="w-6 h-6 text-white" />
                   </div>
                   <span className="text-[10px] font-bold text-gold">{item.label}</span>
