@@ -65,7 +65,7 @@ export default function LocationMap() {
           {/* Map Side */}
           <div className="order-1 lg:order-2 h-[400px] lg:h-[500px] w-full rounded-xl overflow-hidden shadow-lg bg-stone-200 relative flex items-center justify-center">
             <iframe 
-              src="https://maps.google.com/maps?q=Resort%20Aranyak,%20Ghatshila&t=&z=14&ie=UTF8&iwloc=&output=embed"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d117565.48512101683!2d86.3762818972656!3d22.581005900000008!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m3!3m2!1s0x3a164b3ef86f2b7f%3A0xc39955ed2e3bf4a9!2sAranyak%20Resort!5e0!3m2!1sen!2sin"
               width="100%" 
               height="100%" 
               style={{ border: 0 }} 

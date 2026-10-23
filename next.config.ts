@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
       "img-src 'self' data: blob: https://aranyakresortghatsila.com",
       "font-src 'self' data:",
       "connect-src 'self' https://api.razorpay.com https://checkout.razorpay.com",
-      "frame-src 'self' https://www.google.com https://checkout.razorpay.com https://api.razorpay.com",
+      "frame-src 'self' https://www.google.com https://maps.google.com https://checkout.razorpay.com https://api.razorpay.com",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self' https://api.razorpay.com https://checkout.razorpay.com",
