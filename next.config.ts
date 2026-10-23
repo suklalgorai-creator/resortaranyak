@@ -13,10 +13,11 @@ const nextConfig: NextConfig = {
     ],
   },
   async headers() {
+    const developmentScriptPolicy = process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : '';
     const productionOnly = process.env.NODE_ENV === 'production' ? ' upgrade-insecure-requests;' : '';
     const contentSecurityPolicy = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://api.razorpay.com",
+      `script-src 'self' 'unsafe-inline'${developmentScriptPolicy} https://checkout.razorpay.com https://api.razorpay.com`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://aranyakresortghatsila.com",
       "font-src 'self' data:",
