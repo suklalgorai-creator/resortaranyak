@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
       <body className="overflow-x-hidden font-sans antialiased min-h-screen flex flex-col relative">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <LayoutWrapper>{children}</LayoutWrapper>
         </ThemeProvider>
       </body>
