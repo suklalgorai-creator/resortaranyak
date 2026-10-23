@@ -8,8 +8,6 @@ import {
   MAX_STAY_NIGHTS,
 } from '@/validations/booking.schema';
 
-const HOLD_MINUTES = Number(process.env.BOOKING_HOLD_MINUTES || 15);
-
 async function serializable<T>(callback: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
@@ -45,6 +43,7 @@ function validateBookingWindow(checkIn: Date, checkOut: Date): number {
 function activeBookingWhere(now: Date) {
   return {
     OR: [
+      { status: BOOKING_STATUS.REQUESTED },
       { status: BOOKING_STATUS.CONFIRMED },
       {
         status: { in: [BOOKING_STATUS.HOLD, BOOKING_STATUS.PAYMENT_PENDING] },
@@ -185,10 +184,10 @@ async function create(data: {
         guestEmail: data.guestEmail.toLowerCase(),
         guestPhone: data.guestPhone,
         specialRequests: data.specialRequests,
-        status: BOOKING_STATUS.HOLD,
+        status: BOOKING_STATUS.REQUESTED,
         nights,
         totalAmount: nights * room.pricePerNight,
-        expiresAt: new Date(Date.now() + HOLD_MINUTES * 60_000),
+        expiresAt: null,
         accessTokenHash: idempotencyKeyHash,
         idempotencyKeyHash,
         requestFingerprint,
@@ -242,8 +241,32 @@ async function updateStatus(id: string, status: string) {
     });
     if (!booking) throw new NotFoundError('Booking not found');
 
-    if (status === BOOKING_STATUS.CONFIRMED) {
-      throw new ConflictError('Bookings are confirmed only by verified payment');
+    if (status === BOOKING_STATUS.CONFIRMED && booking.status === BOOKING_STATUS.REQUESTED) {
+      const lockedRoom = await tx.$queryRaw<Array<{ id: string }>>(
+        Prisma.sql`SELECT "id" FROM "Room" WHERE "id" = ${booking.roomId} FOR UPDATE`,
+      );
+      if (lockedRoom.length === 0) throw new NotFoundError('Room not found');
+
+      const room = await tx.room.findUnique({ where: { id: booking.roomId } });
+      if (!room || room.status !== ROOM_STATUS.AVAILABLE) {
+        throw new ConflictError('Room is no longer available for booking');
+      }
+
+      const overlappingBookings = await tx.booking.count({
+        where: {
+          id: { not: booking.id },
+          roomId: booking.roomId,
+          ...activeBookingWhere(new Date()),
+          AND: [
+            { checkIn: { lt: booking.checkOut } },
+            { checkOut: { gt: booking.checkIn } },
+          ],
+        },
+      });
+
+      if (overlappingBookings >= room.inventoryCount) {
+        throw new ConflictError('Room is no longer available for these dates');
+      }
     }
     if (status === BOOKING_STATUS.CANCELLED && booking.status === BOOKING_STATUS.CONFIRMED) {
       const captured = booking.payments.some((payment) => payment.status === 'CAPTURED');
@@ -251,6 +274,7 @@ async function updateStatus(id: string, status: string) {
     }
 
     const allowed: Record<string, string[]> = {
+      REQUESTED: [BOOKING_STATUS.CONFIRMED, BOOKING_STATUS.CANCELLED, BOOKING_STATUS.FAILED],
       HOLD: [BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED, BOOKING_STATUS.FAILED],
       PAYMENT_PENDING: [BOOKING_STATUS.CANCELLED, BOOKING_STATUS.EXPIRED, BOOKING_STATUS.FAILED],
       CONFIRMED: [BOOKING_STATUS.CANCEL_REQUESTED, BOOKING_STATUS.COMPLETED],

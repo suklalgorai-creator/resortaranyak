@@ -18,6 +18,7 @@ enum RoomStatus {
 }
 
 enum BookingStatus {
+  REQUESTED
   HOLD
   PAYMENT_PENDING
   CONFIRMED
@@ -77,27 +78,27 @@ model Room {
 }
 
 model Booking {
-  id                String        @id @default(cuid())
-  bookingCode       String        @unique @default(cuid())
-  roomId            String
-  room              Room          @relation(fields: [roomId], references: [id])
-  checkIn           DateTime
-  checkOut          DateTime
-  nights            Int
-  guests            Int
-  totalAmount       Int
-  status            BookingStatus @default(HOLD)
-  guestName         String
-  guestEmail        String
-  guestPhone        String
-  specialRequests   String?
-  expiresAt         DateTime?
-  accessTokenHash   String?       @unique
-  idempotencyKeyHash String?      @unique
+  id                 String        @id @default(cuid())
+  bookingCode        String        @unique @default(cuid())
+  roomId             String
+  room               Room          @relation(fields: [roomId], references: [id])
+  checkIn            DateTime
+  checkOut           DateTime
+  nights             Int
+  guests             Int
+  totalAmount        Int
+  status             BookingStatus @default(HOLD)
+  guestName          String
+  guestEmail         String
+  guestPhone         String
+  specialRequests    String?
+  expiresAt          DateTime?
+  accessTokenHash    String?       @unique
+  idempotencyKeyHash String?       @unique
   requestFingerprint String?
-  payments          Payment[]
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
+  payments           Payment[]
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 
   @@index([roomId, status, checkIn, checkOut])
   @@index([status, expiresAt])
@@ -137,15 +138,15 @@ model Enquiry {
 }
 
 model WebhookEvent {
-  id          String   @id @default(cuid())
-  eventId     String   @unique
+  id          String    @id @default(cuid())
+  eventId     String    @unique
   eventType   String
   payloadHash String
   payload     Json?
-  status      String   @default("PENDING")
-  receivedAt  DateTime @default(now())
+  status      String    @default("PENDING")
+  receivedAt  DateTime  @default(now())
   processedAt DateTime?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
 
   @@index([status])
 }

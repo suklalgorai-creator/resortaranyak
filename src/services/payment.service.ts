@@ -231,7 +231,7 @@ async function handleWebhook(body: string, signature: string, eventId: string) {
           where: { id: attempt.id },
           data: { razorpayPaymentId: paymentId, status: PAYMENT_STATUS.CAPTURED, providerMetadata: entity as Prisma.InputJsonValue },
         });
-        if (booking.status === BOOKING_STATUS.HOLD || booking.status === BOOKING_STATUS.PAYMENT_PENDING) {
+        if (booking.status === BOOKING_STATUS.REQUESTED || booking.status === BOOKING_STATUS.HOLD || booking.status === BOOKING_STATUS.PAYMENT_PENDING) {
           if (booking.expiresAt && booking.expiresAt.getTime() > Date.now()) {
             await tx.booking.update({ where: { id: booking.id }, data: { status: BOOKING_STATUS.CONFIRMED, expiresAt: null } });
           } else {

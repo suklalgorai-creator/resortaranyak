@@ -1,26 +1,29 @@
 'use client';
 
-import Script from 'next/script';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CalendarDays, Users, BedDouble, Phone } from 'lucide-react';
+import { ArrowRight, BedDouble, CalendarDays, CheckCircle2, Clock3, Mail, Phone, ShieldCheck, Sparkles, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 type Room = {
   id: string;
+  slug: string;
   name: string;
   pricePerNight: number;
   maxGuests: number;
   status: string;
+  images: string[];
 };
 
 type BookingResponse = {
-  booking: { id: string; bookingCode: string; nights: number; totalAmount: number };
-  checkoutToken: string;
+  booking: { bookingCode: string; nights: number; totalAmount: number; status: string };
 };
+
+const inputClass = 'mt-2 w-full rounded-xl border border-stone-200 bg-stone-50/70 px-4 py-3.5 text-stone-800 outline-none transition placeholder:text-stone-400 focus:border-gold focus:bg-white focus:ring-4 focus:ring-gold/10 dark:border-white/10 dark:bg-white/5 dark:text-stone-100 dark:focus:bg-white/10';
 
 export default function BookPage() {
   const router = useRouter();
+  const [roomFromUrl, setRoomFromUrl] = useState<string | null>(null);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [selectedRoom, setSelectedRoom] = useState('');
   const [checkIn, setCheckIn] = useState('');
@@ -36,6 +39,7 @@ export default function BookPage() {
   const idempotencyKey = useRef<string | null>(null);
 
   useEffect(() => {
+    setRoomFromUrl(new URLSearchParams(window.location.search).get('room'));
     fetch('/api/rooms')
       .then(async (response) => {
         if (!response.ok) throw new Error('Unable to load rooms');
@@ -45,6 +49,15 @@ export default function BookPage() {
       .catch(() => setError('Unable to load rooms. Please try again later.'))
       .finally(() => setLoadingRooms(false));
   }, []);
+
+  useEffect(() => {
+    if (!roomFromUrl || rooms.length === 0) return;
+    const matchingRoom = rooms.find((room) => room.slug === roomFromUrl || room.id === roomFromUrl);
+    if (matchingRoom) {
+      setSelectedRoom(matchingRoom.id);
+      setGuests((currentGuests) => Math.min(currentGuests, matchingRoom.maxGuests));
+    }
+  }, [roomFromUrl, rooms]);
 
   const selected = rooms.find((room) => room.id === selectedRoom);
   const nights = checkIn && checkOut
@@ -59,7 +72,7 @@ export default function BookPage() {
   };
 
   const canSubmit = useMemo(() => Boolean(
-    selected && checkIn && checkOut && name && phone && email && nights > 0 && guests <= selected.maxGuests,
+    selected && checkIn && checkOut && name.trim() && phone.trim() && email.trim() && nights > 0 && guests <= selected.maxGuests,
   ), [selected, checkIn, checkOut, name, phone, email, nights, guests]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -82,90 +95,49 @@ export default function BookPage() {
         body: JSON.stringify({ roomId: selected.id, checkIn, checkOut, guests, guestName: name, guestEmail: email, guestPhone: phone, specialRequests }),
       });
       const bookingResult = await bookingResponse.json() as { success: boolean; error?: string; data?: BookingResponse };
-      if (!bookingResponse.ok || !bookingResult.data) throw new Error(bookingResult.error || 'Unable to create booking');
+      if (!bookingResponse.ok || !bookingResult.data) throw new Error(bookingResult.error || 'Unable to send booking request');
 
-      const orderResponse = await fetch('/api/payment/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ checkoutToken: bookingResult.data.checkoutToken }),
-      });
-      const orderResult = await orderResponse.json() as { success: boolean; error?: string; data?: { id: string; amount: number; currency: string; key_id: string } };
-      if (!orderResponse.ok || !orderResult.data) throw new Error(orderResult.error || 'Unable to start payment');
-      if (!window.Razorpay) throw new Error('Payment checkout is still loading. Please try again.');
-
-      const checkout = new window.Razorpay({
-        key: orderResult.data.key_id,
-        amount: orderResult.data.amount,
-        currency: orderResult.data.currency,
-        name: 'Resort Arranyak',
-        description: `Booking ${bookingResult.data.booking.bookingCode}`,
-        order_id: orderResult.data.id,
-        prefill: { name, email, contact: phone },
-        handler: async (response) => {
-          const verification = await fetch('/api/payment/verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...response, checkoutToken: bookingResult.data?.checkoutToken }),
-          });
-          const result = await verification.json() as { success: boolean; error?: string };
-          if (!verification.ok || !result.success) {
-            setError(result.error || 'Payment could not be verified. Please contact the resort.');
-            setSubmitting(false);
-            return;
-          }
-          router.push(`/booking/confirmation/${encodeURIComponent(bookingResult.data?.booking.bookingCode || '')}`);
-        },
-        modal: { ondismiss: () => setSubmitting(false) },
-      });
-      checkout.open();
+      router.push(`/booking/confirmation/${encodeURIComponent(bookingResult.data.booking.bookingCode)}`);
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : 'Unable to complete booking');
+      setError(submitError instanceof Error ? submitError.message : 'Unable to send booking request');
       setSubmitting(false);
     }
   }
 
   return (
-    <section className="min-h-screen pt-24 pb-24 sm:pb-16 px-4">
-      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" />
-      <div className="max-w-4xl mx-auto">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl text-forest dark:text-stone-100 font-bold text-center mb-2">Book Your Stay</h1>
-          <p className="text-center text-sm sm:text-base text-stone-500 dark:text-stone-400 mb-8 sm:mb-10">Reserve your perfect getaway at Resort Arranyak</p>
+    <section className="min-h-screen bg-gradient-to-b from-stone-50 via-white to-amber-50/40 px-4 pb-24 pt-28 dark:from-[#101713] dark:via-[#17251e] dark:to-[#101713] sm:px-6">
+      <div className="mx-auto max-w-6xl">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mx-auto mb-10 max-w-3xl text-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.24em] text-gold"><Sparkles className="h-3.5 w-3.5" /> Plan your escape</span>
+          <h1 className="mt-5 font-serif text-4xl font-bold tracking-tight text-forest dark:text-stone-100 sm:text-5xl md:text-6xl">Request your stay</h1>
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-stone-600 dark:text-stone-300">Tell us when you would like to visit. Our team will check availability and get back to you with a confirmation.</p>
         </motion.div>
 
-        <form onSubmit={handleSubmit} className="bg-white dark:bg-white/5 glass-card rounded-2xl border border-stone-200 dark:border-white/5 p-4 sm:p-6 md:p-10 shadow-xl space-y-6 sm:space-y-8">
-          {error && <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-red-700">{error}</p>}
-          <div>
-            <label className="flex items-center gap-2 text-sm font-semibold text-stone-700 dark:text-stone-300 mb-3"><BedDouble className="w-4 h-4" /> Select Room Type</label>
-            {loadingRooms ? <p className="text-stone-500">Loading rooms…</p> : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {rooms.map((room) => (
-                  <button key={room.id} type="button" onClick={() => { setSelectedRoom(room.id); setGuests(Math.min(guests, room.maxGuests)); resetRequest(); }} className={`p-4 rounded-xl border text-left transition-all ${selectedRoom === room.id ? 'border-gold bg-gold/10 ring-2 ring-gold/30' : 'border-stone-200 dark:border-white/10 hover:border-gold/50'}`}>
-                    <span className="font-semibold text-stone-800 dark:text-stone-200">{room.name}</span>
-                    <span className="block text-sm text-gold font-bold mt-1">₹{room.pricePerNight.toLocaleString()}/night · up to {room.maxGuests}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.45fr)_minmax(280px,0.55fr)] lg:items-start">
+          <motion.form initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} onSubmit={handleSubmit} className="rounded-3xl border border-stone-200/80 bg-white/90 p-5 shadow-[0_24px_80px_-35px_rgba(23,58,42,0.45)] backdrop-blur sm:p-8 dark:border-white/10 dark:bg-white/[0.06]">
+            <div className="mb-7 flex items-start justify-between gap-4 border-b border-stone-100 pb-6 dark:border-white/10">
+              <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-gold">Step 1</p><h2 className="mt-1 font-serif text-2xl font-semibold text-forest dark:text-stone-100">Choose your room</h2></div>
+              <div className="hidden rounded-2xl bg-forest/5 p-3 text-forest sm:block dark:bg-white/10 dark:text-gold"><BedDouble className="h-6 w-6" /></div>
+            </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <label className="text-sm font-semibold text-stone-700 dark:text-stone-300"><span className="flex items-center gap-2 mb-2"><CalendarDays className="w-4 h-4" /> Check-in Date</span><input required type="date" min={today} value={checkIn} onChange={(event) => { setCheckIn(event.target.value); resetRequest(); }} className="w-full px-4 py-3 rounded-lg border border-stone-300 bg-transparent" /></label>
-            <label className="text-sm font-semibold text-stone-700 dark:text-stone-300"><span className="flex items-center gap-2 mb-2"><CalendarDays className="w-4 h-4" /> Check-out Date</span><input required type="date" min={checkIn || today} value={checkOut} onChange={(event) => { setCheckOut(event.target.value); resetRequest(); }} className="w-full px-4 py-3 rounded-lg border border-stone-300 bg-transparent" /></label>
-          </div>
+            {error && <div role="alert" className="mb-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"><span className="mt-0.5">!</span><span>{error}</span></div>}
+            <div>
+              <div className="mb-3 flex items-center justify-between"><label className="text-sm font-semibold text-stone-700 dark:text-stone-200">Available room types</label><span className="text-xs text-stone-500 dark:text-stone-400">No payment required</span></div>
+              {loadingRooms ? <div className="grid gap-3 sm:grid-cols-2"><div className="h-24 animate-pulse rounded-2xl bg-stone-100 dark:bg-white/10" /><div className="h-24 animate-pulse rounded-2xl bg-stone-100 dark:bg-white/10" /></div> : rooms.length === 0 ? <p className="rounded-2xl bg-stone-50 p-5 text-sm text-stone-500 dark:bg-white/5">No rooms are currently available.</p> : <div className="grid gap-3 sm:grid-cols-2">{rooms.map((room) => <button key={room.id} type="button" aria-pressed={selectedRoom === room.id} onClick={() => { setSelectedRoom(room.id); setGuests(Math.min(guests, room.maxGuests)); resetRequest(); }} className={`group flex items-center gap-3 rounded-2xl border p-3 text-left transition-all ${selectedRoom === room.id ? 'border-gold bg-gold/10 shadow-[0_8px_24px_-16px_rgba(211,154,24,0.9)] ring-2 ring-gold/20' : 'border-stone-200 bg-white hover:-translate-y-0.5 hover:border-gold/50 hover:shadow-md dark:border-white/10 dark:bg-white/[0.03]'}`}><img src={room.images[0] || '/hero-resort.jpg'} alt="" className="h-16 w-16 rounded-xl object-cover" /><span className="min-w-0 flex-1"><span className="block truncate font-semibold text-stone-800 dark:text-stone-100">{room.name}</span><span className="mt-1 block text-xs text-stone-500 dark:text-stone-400">Up to {room.maxGuests} guests</span><span className="mt-1 block text-sm font-bold text-gold">Rs. {room.pricePerNight.toLocaleString()} / night</span></span><CheckCircle2 className={`h-5 w-5 shrink-0 ${selectedRoom === room.id ? 'text-gold' : 'text-stone-200 dark:text-white/15'}`} /></button>)}</div>}
+            </div>
 
-          <label className="block text-sm font-semibold text-stone-700 dark:text-stone-300"><span className="flex items-center gap-2 mb-2"><Users className="w-4 h-4" /> Number of Guests</span><select required value={guests} onChange={(event) => { setGuests(Number(event.target.value)); resetRequest(); }} className="w-full sm:w-48 px-4 py-3 rounded-lg border border-stone-300 bg-transparent">{Array.from({ length: selected?.maxGuests || 1 }, (_, index) => index + 1).map((value) => <option key={value} value={value}>{value} Guest{value > 1 ? 's' : ''}</option>)}</select></label>
+            <div className="mt-8 border-t border-stone-100 pt-7 dark:border-white/10"><p className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-gold">Step 2 · Dates & guests</p><div className="grid gap-5 sm:grid-cols-2"><label className="text-sm font-semibold text-stone-700 dark:text-stone-200"><span className="flex items-center gap-2"><CalendarDays className="h-4 w-4 text-gold" /> Check-in date</span><input required type="date" min={today} value={checkIn} onChange={(event) => { setCheckIn(event.target.value); resetRequest(); }} className={inputClass} /></label><label className="text-sm font-semibold text-stone-700 dark:text-stone-200"><span className="flex items-center gap-2"><CalendarDays className="h-4 w-4 text-gold" /> Check-out date</span><input required type="date" min={checkIn || today} value={checkOut} onChange={(event) => { setCheckOut(event.target.value); resetRequest(); }} className={inputClass} /></label></div><label className="mt-5 block text-sm font-semibold text-stone-700 dark:text-stone-200"><span className="flex items-center gap-2"><Users className="h-4 w-4 text-gold" /> Number of guests</span><select required value={guests} onChange={(event) => { setGuests(Number(event.target.value)); resetRequest(); }} className={inputClass}>{Array.from({ length: selected?.maxGuests || 1 }, (_, index) => index + 1).map((value) => <option key={value} value={value}>{value} Guest{value > 1 ? 's' : ''}</option>)}</select></label></div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <label className="text-sm font-semibold text-stone-700 dark:text-stone-300">Full Name<input required maxLength={100} value={name} onChange={(event) => { setName(event.target.value); resetRequest(); }} className="mt-2 w-full px-4 py-3 rounded-lg border border-stone-300 bg-transparent" /></label>
-            <label className="text-sm font-semibold text-stone-700 dark:text-stone-300"><span className="flex items-center gap-2"><Phone className="w-4 h-4" /> Phone</span><input required maxLength={30} value={phone} onChange={(event) => { setPhone(event.target.value); resetRequest(); }} className="mt-2 w-full px-4 py-3 rounded-lg border border-stone-300 bg-transparent" /></label>
-            <label className="text-sm font-semibold text-stone-700 dark:text-stone-300">Email<input required type="email" maxLength={254} value={email} onChange={(event) => { setEmail(event.target.value); resetRequest(); }} className="mt-2 w-full px-4 py-3 rounded-lg border border-stone-300 bg-transparent" /></label>
-          </div>
-          <label className="block text-sm font-semibold text-stone-700 dark:text-stone-300">Special requests<textarea maxLength={1000} value={specialRequests} onChange={(event) => { setSpecialRequests(event.target.value); resetRequest(); }} className="mt-2 w-full px-4 py-3 rounded-lg border border-stone-300 bg-transparent" rows={3} /></label>
+            <div className="mt-8 border-t border-stone-100 pt-7 dark:border-white/10"><p className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-gold">Step 3 · Your details</p><div className="grid gap-5 sm:grid-cols-2"><label className="text-sm font-semibold text-stone-700 dark:text-stone-200">Full name<input required maxLength={100} value={name} onChange={(event) => { setName(event.target.value); resetRequest(); }} placeholder="Your full name" className={inputClass} /></label><label className="text-sm font-semibold text-stone-700 dark:text-stone-200"><span className="flex items-center gap-2"><Phone className="h-4 w-4 text-gold" /> Phone number</span><input required maxLength={30} value={phone} onChange={(event) => { setPhone(event.target.value); resetRequest(); }} placeholder="+91 ..." className={inputClass} /></label><label className="text-sm font-semibold text-stone-700 dark:text-stone-200 sm:col-span-2"><span className="flex items-center gap-2"><Mail className="h-4 w-4 text-gold" /> Email address</span><input required type="email" maxLength={254} value={email} onChange={(event) => { setEmail(event.target.value); resetRequest(); }} placeholder="you@example.com" className={inputClass} /></label></div><label className="mt-5 block text-sm font-semibold text-stone-700 dark:text-stone-200">Special requests <span className="font-normal text-stone-400">(optional)</span><textarea maxLength={1000} value={specialRequests} onChange={(event) => { setSpecialRequests(event.target.value); resetRequest(); }} placeholder="Dietary needs, arrival time, or anything else we should know..." className={`${inputClass} resize-none`} rows={4} /></label></div>
 
-          {selected && nights > 0 && <div className="bg-stone-50 dark:bg-white/5 rounded-xl p-4 sm:p-6 border border-stone-200"><div className="flex justify-between gap-4"><span>{nights} night{nights > 1 ? 's' : ''}</span><strong>₹{total.toLocaleString()}</strong></div></div>}
-          <button type="submit" disabled={submitting || !canSubmit} className="w-full py-4 bg-gold hover:bg-gold-light disabled:opacity-50 text-stone-900 font-bold text-lg rounded-lg">{submitting ? 'Preparing secure checkout…' : 'Continue to secure payment'}</button>
-        </form>
+            <button type="submit" disabled={submitting || !canSubmit} aria-busy={submitting} className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-gold px-6 py-4 text-base font-bold text-stone-950 shadow-lg shadow-gold/20 transition hover:bg-gold-light hover:shadow-gold/30 disabled:cursor-not-allowed disabled:opacity-50">{submitting ? 'Sending request...' : 'Send booking request'}{!submitting && <ArrowRight className="h-5 w-5" />}</button>
+          </motion.form>
+
+          <motion.aside initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }} className="space-y-4 lg:sticky lg:top-28">
+            <div className="overflow-hidden rounded-3xl bg-forest p-6 text-white shadow-xl shadow-forest/20 sm:p-7"><div className="flex items-center gap-3"><div className="rounded-2xl bg-gold p-3 text-stone-950"><Clock3 className="h-5 w-5" /></div><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-gold-light">Your request</p><h2 className="mt-1 font-serif text-2xl">Stay summary</h2></div></div><div className="mt-7 space-y-4 border-t border-white/15 pt-5 text-sm">{selected ? <><div className="flex justify-between gap-4"><span className="text-white/65">Room</span><strong className="text-right">{selected.name}</strong></div><div className="flex justify-between gap-4"><span className="text-white/65">Guests</span><strong>{guests}</strong></div>{nights > 0 && <div className="flex justify-between gap-4"><span className="text-white/65">Stay</span><strong>{nights} night{nights > 1 ? 's' : ''}</strong></div>}<div className="flex justify-between gap-4 border-t border-white/15 pt-4"><span className="text-white/65">Estimated total</span><strong className="text-lg text-gold-light">{nights > 0 ? `Rs. ${total.toLocaleString()}` : 'Select dates'}</strong></div></> : <p className="leading-6 text-white/70">Select a room and dates to see your estimated stay summary.</p>}</div></div>
+            <div className="rounded-3xl border border-stone-200 bg-white/80 p-6 dark:border-white/10 dark:bg-white/[0.06]"><p className="text-sm font-semibold text-forest dark:text-stone-100">What happens next?</p><ul className="mt-4 space-y-4 text-sm text-stone-600 dark:text-stone-300"><li className="flex gap-3"><ShieldCheck className="h-5 w-5 shrink-0 text-gold" /><span>We check the room availability for your dates.</span></li><li className="flex gap-3"><Phone className="h-5 w-5 shrink-0 text-gold" /><span>Our team contacts you to confirm the stay.</span></li><li className="flex gap-3"><CheckCircle2 className="h-5 w-5 shrink-0 text-gold" /><span>No payment is required at this stage.</span></li></ul></div>
+          </motion.aside>
+        </div>
       </div>
     </section>
   );

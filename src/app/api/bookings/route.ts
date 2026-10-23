@@ -41,7 +41,6 @@ export async function POST(req: NextRequest) {
           status: result.booking.status,
           expiresAt: result.booking.expiresAt,
         },
-        checkoutToken: idempotencyKey,
         reused: result.reused,
       },
     }, { status: result.reused ? 200 : 201 });

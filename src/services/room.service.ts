@@ -14,8 +14,26 @@ async function getAll() {
   });
 }
 
+async function getPublicAll() {
+  return await prisma.room.findMany({
+    where: { status: ROOM_STATUS.AVAILABLE },
+    orderBy: [
+      { featured: 'desc' },
+      { createdAt: 'desc' },
+    ],
+  });
+}
+
 async function getBySlug(slug: string) {
   const room = await prisma.room.findFirst({ where: { slug, status: { not: ROOM_STATUS.DEACTIVATED } } });
+  if (!room) {
+    throw new NotFoundError('Room not found');
+  }
+  return room;
+}
+
+async function getPublicBySlug(slug: string) {
+  const room = await prisma.room.findFirst({ where: { slug, status: ROOM_STATUS.AVAILABLE } });
   if (!room) {
     throw new NotFoundError('Room not found');
   }
@@ -52,4 +70,4 @@ async function deactivate(id: string) {
   });
 }
 
-export const roomService = { getAll, getBySlug, getById, create, update, deactivate };
+export const roomService = { getAll, getPublicAll, getBySlug, getPublicBySlug, getById, create, update, deactivate };

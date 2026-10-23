@@ -6,7 +6,7 @@ import { z } from 'zod/v4';
 export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params;
-    const room = await roomService.getBySlug(slug);
+    const room = await roomService.getPublicBySlug(slug);
     return NextResponse.json({ success: true, data: room });
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {

@@ -4,7 +4,7 @@ import { AppError } from '@/lib/errors';
 
 export async function GET() {
   try {
-    const rooms = await roomService.getAll();
+    const rooms = await roomService.getPublicAll();
     return NextResponse.json({ success: true, data: rooms });
   } catch (error: unknown) {
     const statusCode = error instanceof AppError ? error.statusCode : 500;

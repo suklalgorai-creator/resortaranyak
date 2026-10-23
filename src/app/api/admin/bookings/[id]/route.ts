@@ -8,6 +8,7 @@ import { hasAdminRole } from '@/lib/authz';
 
 const updateStatusSchema = z.object({
   status: z.enum([
+    BOOKING_STATUS.CONFIRMED,
     BOOKING_STATUS.CANCELLED,
     BOOKING_STATUS.CANCEL_REQUESTED,
     BOOKING_STATUS.EXPIRED,
