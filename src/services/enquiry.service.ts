@@ -10,14 +10,16 @@ async function create(data: CreateEnquiryInput) {
   });
 }
 
-async function getAll(page: number = 1, pageSize: number = 10) {
+async function getAll(page: number = 1, pageSize: number = 10, status?: string) {
+  const where = status ? { status: status as never } : {};
   const [data, total] = await Promise.all([
     prisma.enquiry.findMany({
+      where,
       skip: (page - 1) * pageSize,
       take: pageSize,
       orderBy: { createdAt: 'desc' }
     }),
-    prisma.enquiry.count()
+    prisma.enquiry.count({ where })
   ]);
   
   return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };

@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
       guestName: validatedData.guestName,
       guestEmail: validatedData.guestEmail,
       guestPhone: validatedData.guestPhone,
+      arrivalTime: validatedData.arrivalTime,
       specialRequests: validatedData.specialRequests,
       idempotencyKey,
     });

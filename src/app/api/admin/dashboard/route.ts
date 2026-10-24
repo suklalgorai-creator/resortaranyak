@@ -10,11 +10,12 @@ export async function GET() {
   }
 
   try {
-    const [stats, recentBookings] = await Promise.all([
+    const [stats, recentBookings, recentEnquiries] = await Promise.all([
       dashboardService.getStats(),
       dashboardService.getRecentBookings(5),
+      dashboardService.getRecentEnquiries(5),
     ]);
-    return NextResponse.json({ success: true, data: { stats, recentBookings } });
+    return NextResponse.json({ success: true, data: { stats, recentBookings, recentEnquiries } });
   } catch {
     return NextResponse.json({ success: false, error: 'Failed to fetch dashboard data' }, { status: 500 });
   }

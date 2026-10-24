@@ -11,9 +11,11 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url);
   const page = Math.max(1, Math.min(10_000, Number.parseInt(searchParams.get('page') || '1', 10) || 1));
+  const requestedStatus = searchParams.get('status');
+  const status = requestedStatus && ['UNREAD', 'READ', 'REPLIED'].includes(requestedStatus) ? requestedStatus : undefined;
 
   try {
-    const enquiries = await enquiryService.getAll(page);
+    const enquiries = await enquiryService.getAll(page, 10, status);
     return NextResponse.json({ success: true, data: enquiries });
   } catch {
     return NextResponse.json({ success: false, error: 'Failed to fetch enquiries' }, { status: 500 });

@@ -118,6 +118,7 @@ async function create(data: {
   guestName: string;
   guestEmail: string;
   guestPhone: string;
+  arrivalTime?: string;
   specialRequests?: string;
   idempotencyKey: string;
 }) {
@@ -132,6 +133,7 @@ async function create(data: {
     guestName: data.guestName,
     guestEmail: data.guestEmail.toLowerCase(),
     guestPhone: data.guestPhone,
+    arrivalTime: data.arrivalTime || '',
     specialRequests: data.specialRequests || '',
   });
 
@@ -183,6 +185,7 @@ async function create(data: {
         guestName: data.guestName,
         guestEmail: data.guestEmail.toLowerCase(),
         guestPhone: data.guestPhone,
+        arrivalTime: data.arrivalTime || null,
         specialRequests: data.specialRequests,
         status: BOOKING_STATUS.REQUESTED,
         nights,

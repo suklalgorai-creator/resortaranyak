@@ -15,6 +15,7 @@ export const createBookingSchema = z.object({
   guestName: z.string().trim().min(2).max(100),
   guestEmail: z.string().trim().email().max(254),
   guestPhone: z.string().trim().min(10).max(30).regex(/^[+()\-\s\d]+$/, 'Invalid phone number'),
+  arrivalTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Use a valid arrival time').optional(),
   specialRequests: z.string().trim().max(1000).optional(),
 }).refine((data) => data.checkOut > data.checkIn, {
   message: 'Check-out must be after check-in',

@@ -91,6 +91,7 @@ model Booking {
   guestName          String
   guestEmail         String
   guestPhone         String
+  arrivalTime        String?
   specialRequests    String?
   expiresAt          DateTime?
   accessTokenHash    String?       @unique
